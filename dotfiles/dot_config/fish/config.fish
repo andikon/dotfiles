@@ -9,6 +9,9 @@ set -gx MANPAGER "nvim -c 'Man!' -o -"
 set -gx TERM tmux-256color
 set -gx XDG_CONFIG_HOME $HOME/.config
 
+# Add local bin to PATH
+fish_add_user_paths $HOME/.local/bin
+
 # Key bindings (emacs-style like your zsh)
 fish_default_key_bindings
 
