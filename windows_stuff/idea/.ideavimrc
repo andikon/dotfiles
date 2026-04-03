@@ -1,0 +1,51 @@
+let mapleader=" "
+set clipboard=unnamedplus
+set hlsearch
+set showmode
+set so=5
+set incsearch
+set ignorecase
+set nu
+
+Plug 'machakann/vim-highlightedyank'
+Plug 'preservim/nerdtree'
+
+nnoremap <C-h> <Action>(PreviousTab)
+nnoremap <C-l> <Action>(NextTab)
+
+nnoremap <Esc> :nohlsearch<CR>
+nnoremap x "_x
+vnoremap p "_dP
+
+map <leader>d <Action>(Debug)
+
+nmap <leader>f :action SearchEverywhere<CR>
+nmap <leader>p :action GotoAction<CR>
+nmap <leader>g :action FindInPath<CR>
+nnoremap <leader>ss :action Find<CR>
+nnoremap <leader>h :action QuickJavaDoc<CR>
+nnoremap <leader>lt :action FileStructurePopup<CR>
+nnoremap <leader>lq :action ProblemsView.ToolWindow<CR>
+
+nmap <leader>w :action SaveAll<CR>
+
+nmap <leader>ca :action ShowIntentionActions<CR>
+nmap <leader>cg :action Generate<CR>
+nmap <leader>cf :action ReformatCode<CR>
+nmap <leader>rr :action RenameElement<CR>
+
+nmap gd :action GotoDeclaration<CR>
+nmap gD :action GotoSuperMethod<CR>
+nmap gr :action FindUsages<CR>
+nmap gi :action GotoImplementation<CR>
+nmap K :action QuickJavaDoc<CR>
+
+map <leader>e :NERDTreeToggle<CR>
+map <leader>q :q<CR>
+
+nmap <leader>t :action Terminal.OpenInTerminal<CR>
+nnoremap x "_x
+
+vmap J :action MoveLineDown<CR>
+vmap K :action MoveLineUp<CR>
+
