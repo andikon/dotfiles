@@ -19,6 +19,7 @@
           modules = [
             {
               _module.args.customUsername = username;
+              _module.args.dotfilesDir = self;
             }
             ./home-manager/home.nix
           ];
@@ -28,7 +29,8 @@
       homeConfigurations = {
         # Replace 'user' and 'hostname' with your actual user and hostname
         # Usage: home-manager switch --flake .#user@hostname
-        "user@hostname" = mkHomeConfig "user" "hostname";
+        "dev@docker" = mkHomeConfig "dev" "docker";
+		"anko@wsl" = mkHomeConfig "anko" "wsl";
       };
     };
 }
