@@ -12,7 +12,6 @@
       git
 	  wget
 	  curl
-	  build-essential
 	  ripgrep
 	  fzf
 	  tree
