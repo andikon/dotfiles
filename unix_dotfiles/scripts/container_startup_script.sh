@@ -12,6 +12,6 @@ if [ -f /tmp/cert.pem ]; then
 fi
 
 
-"$SCRIPT_DIR/init_all_projects.sh"
+"init_all_projects.sh"
 
-exec "$SCRIPT_DIR/select_tmux_session.sh"
+exec "select_tmux_session.sh"

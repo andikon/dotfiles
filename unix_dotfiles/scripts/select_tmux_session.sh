@@ -18,7 +18,7 @@ if [ -z "$SELECTED" ]; then
 fi
 
 # create .curproj file
-echo "$SELECTED" > /projects/.curproj
+echo "$SELECTED" > $HOME/projects/.curproj
 
 
 # If already inside tmux, switch client; otherwise attach
