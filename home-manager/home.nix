@@ -11,9 +11,9 @@
     packages = with pkgs; [
       git
       neovim
+      eza
       fish
       tmux
-      zsh
       # Add other packages you need here
     ];
 
