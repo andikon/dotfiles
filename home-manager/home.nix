@@ -10,11 +10,18 @@
     # Install packages you need
     packages = with pkgs; [
       git
+	  wget
+	  curl
+	  build-essential
+	  ripgrep
+	  fzf
+	  tree
+	  htop
+	  unzip
       neovim
       eza
       fish
       tmux
-      # Add other packages you need here
     ];
 
     # Symlink .tmux.conf
@@ -36,22 +43,22 @@
   };
 
   # Symlink scripts to ~/.local/bin for PATH access
-  home.file.".local/bin/container_startup_script" = {
+  home.file.".local/bin/container_startup_script.sh" = {
     source = "${dotfilesDir}/unix_dotfiles/scripts/container_startup_script.sh";
     executable = true;
   };
 
-  home.file.".local/bin/create_tmux_session" = {
+  home.file.".local/bin/create_tmux_session.sh" = {
     source = "${dotfilesDir}/unix_dotfiles/scripts/create_tmux_session.sh";
     executable = true;
   };
 
-  home.file.".local/bin/select_tmux_session" = {
+  home.file.".local/bin/select_tmux_session.sh" = {
     source = "${dotfilesDir}/unix_dotfiles/scripts/select_tmux_session.sh";
     executable = true;
   };
 
-  home.file.".local/bin/init_all_projects" = {
+  home.file.".local/bin/init_all_projects.sh" = {
     source = "${dotfilesDir}/unix_dotfiles/scripts/init_all_projects.sh";
     executable = true;
   };
