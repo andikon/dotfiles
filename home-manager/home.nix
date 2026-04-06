@@ -52,13 +52,13 @@
 	  lua-language-server
 
 	  ## --- Java ---
-	  openjdk-headless
+	  jdk25_headless
 	  jdt-language-server
 	  gradle
 	  maven
 
 	  ## --- .NET ---
-	  dotnet-sdk-wrapped
+	  dotnet-sdk_10
 	  omnisharp-roslyn
 
 	  ## --- General LSP tooling ---
