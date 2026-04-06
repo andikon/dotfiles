@@ -8,20 +8,63 @@
     stateVersion = "24.05"; # Match your NixOS/Home Manager version
 
     # Install packages you need
-    packages = with pkgs; [
-      git
+	packages = with pkgs; [
+	  ## --- Core CLI ---
+	  git
 	  wget
 	  curl
 	  ripgrep
+	  fd
 	  fzf
 	  tree
 	  htop
 	  unzip
-      neovim
-      eza
-      fish
-      tmux
-    ];
+	  zip
+	  gnupg
+	  jq
+	  bat
+	  eza
+	  fish
+	  tmux
+	  neovim
+
+	  ## --- Build / Dev essentials ---
+	  gcc
+	  gnumake
+	  pkg-config
+	  cmake
+	  just
+
+	  ## --- Search / navigation helpers ---
+	  zoxide
+
+	  ## --- Node / JS / TS / Angular ---
+	  nodejs_25
+	  typescript
+	  typescript-language-server
+	  vscode-langservers-extracted
+	  angular-language-server
+	  prettier
+	  eslint
+
+	  ## --- Lua ---
+	  lua
+	  lua-language-server
+
+	  ## --- Java ---
+	  openjdk-headless
+	  jdt-language-server
+	  gradle
+	  maven
+
+	  ## --- .NET ---
+	  dotnet-sdk-wrapped
+	  omnisharp-roslyn
+
+	  ## --- General LSP tooling ---
+	  nil
+	  nixfmt
+	];
 
     # Symlink .tmux.conf
     file.".tmux.conf" = {
