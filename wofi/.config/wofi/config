@@ -1,0 +1,10 @@
+show=drun
+prompt=Search apps...
+allow_images=true
+width=35%
+height=35%
+
+show_all=false
+insensitive=true
+
+no_actions=true

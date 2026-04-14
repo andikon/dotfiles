@@ -1,0 +1,144 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 28,
+
+  "modules-left": [
+    "custom/hostname",
+    "custom/sep",
+    "custom/weather",
+    "custom/sep",
+    "clock#date",
+    "custom/sep",
+    "clock#time"
+  ],
+
+  "modules-center": [
+    "hyprland/workspaces"
+  ],
+
+  "modules-right": [
+    "tray",
+    "custom/sep",
+    "cpu",
+    "custom/sep",
+    "memory",
+    "custom/sep",
+    "custom/gpu",
+    "custom/sep",
+    "cava",
+    "pulseaudio",
+    "custom/sep",
+    "network",
+    "custom/sep",
+    "bluetooth",
+    "custom/sep",
+    "custom/notifications",
+    "custom/sep",
+    "custom/power"
+  ],
+
+// --- separator ---
+  "custom/sep": {
+    "format": "|",
+    "tooltip": false
+  },
+  // LEFT
+
+  "custom/hostname": {
+    "exec": "hostname",
+    "interval": 3600
+  },
+
+  "custom/weather": {
+    "exec": "~/.config/waybar/scripts/weather.sh",
+    "interval": 600
+  },
+
+  "clock#date": {
+    "format": "{:%A %d.%m}",
+    "tooltip": false
+  },
+
+  "clock#time": {
+    "format": "{:%H:%M}",
+    "tooltip": false
+  },
+
+  // CENTER
+
+ "hyprland/workspaces": {
+    "format": "{name}",
+    "persistent-workspaces": {
+      "*": [1,2,3,4,5,6,7,8,9,10]
+    }
+  },
+
+  // RIGHT
+
+
+"cpu": {
+  "format": " {usage}%"
+},
+
+"memory": {
+  "format": " {used:0.1f}/{total:0.1f}G"
+},
+
+"custom/gpu": {
+  "exec": "~/.config/waybar/scripts/gpu.sh",
+  "interval": 5
+},
+
+"pulseaudio": {
+  "format": "{icon} {volume}%",
+  "format-icons": {
+    "default": ["", "", ""]
+  },
+  "scroll-step": 5,
+  "on-click": "pavucontrol"
+},
+
+
+"cava": {
+    "cava_config": "$XDG_CONFIG_HOME/cava/waybar_raw.conf",
+    "input_delay": 2,
+    "format-icons" : ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" ],
+    "actions": {
+        "on-click-right": "mode"
+    }
+},
+    
+"network": {
+  "format-wifi": "",
+  "format-ethernet": "󰈀",
+  "format-disconnected": "󰖪",
+  "on-click": "nm-connection-editor"
+},
+
+"bluetooth": {
+  "format": " {status}",
+  "format-disabled": "󰂲 off",
+  "format-connected": " on",
+  "on-click": "blueman-manager"
+},
+
+"custom/notifications": {
+  "format": "",
+  "on-click": "swaync-client -t"
+},
+
+"tray": {
+    "icon-size": 21,
+    "spacing": 10,
+    "icons": {
+        "blueman": "bluetooth",
+        "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
+    }
+},
+
+"custom/power": {
+  "format": "",
+  "on-click": "~/.config/waybar/scripts/powermenu.sh"
+}
+}

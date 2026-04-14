@@ -28,8 +28,11 @@ end
 alias v nvim
 alias g git
 alias t tmux
+alias gaa "git add ."
 alias gs "git status"
-alias gc "git commit"
+alias gd "git diff --cached"
+alias gc "git commit -m"
+alias gca "git commit -am"
 alias gp "git push"
 alias gl "git pull"
 

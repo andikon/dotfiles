@@ -1,5 +1,14 @@
-background-opacity = 0.9
-background-blur = true
+# Font
+font-family = "JetBrainsMono Nerd Font"
+font-style = Regular
+font-size = 14
+
+# Window
+window-padding-x = 14
+window-padding-y = 14
+confirm-close-surface=false
+resize-overlay = never
+gtk-toolbar-style = flat
 
 palette = 0=#12161a
 palette = 1=#F97791
@@ -26,4 +35,10 @@ selection-foreground = #E7EAEE
 
 # other
 copy-on-select = clipboard
-cursor-style = block
+
+# Cursor styling
+cursor-style = "block"
+cursor-style-blink = false
+
+# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
+async-backend = epoll

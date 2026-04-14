@@ -1,0 +1,81 @@
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 14px;
+}
+
+window#waybar {
+  background: rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+.modules-left {
+    margin-left: 10px;
+}
+
+.modules-right {
+    margin-right: 10px;
+}
+#custom-hostname {
+    color: #38FFA5;
+}
+
+/* spacing */
+#custom-hostname,
+#custom-weather,
+#clock,
+#cpu,
+#memory,
+#pulseaudio,
+#network,
+#bluetooth,
+#custom-gpu,
+#custom-notifications,
+#custom-power,
+#custom-sep {
+  padding: 0 6px;
+}
+
+#cava {
+  padding: 0 6px;
+}
+
+/* separator style */
+#custom-sep {
+  opacity: 0.3;
+}
+
+/* WORKSPACES — minimal numbers only */
+#workspaces {
+  margin: 0 10px;
+}
+
+#workspaces button.empty {
+  color: rgba(255,255,255,0.3);
+}
+
+#workspaces button {
+  padding: 0 6px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #ffffff;
+}
+
+#workspaces button.active {
+  color: #38FFA5;
+}
+
+/* remove hover boxes */
+#workspaces button:hover {
+  background: transparent;
+  color: rgba(255,255,255,0.8);
+}
+
+/* make icons crisp */
+#cpu, #memory, #custom-gpu, #pulseaudio, #network, #bluetooth {
+  font-weight: 500;
+}
+/* dim secondary numbers slightly */
+#memory, #cpu, #custom-gpu {
+  opacity: 0.9;
+}
