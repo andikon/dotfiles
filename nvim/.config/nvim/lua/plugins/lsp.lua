@@ -30,13 +30,6 @@ return {
             vim.lsp.enable({ "lua_ls", "angularls", "tailwindcss", "ts_ls", "clangd" })
         end,
     },
-    {"seblyng/roslyn.nvim"},
-    {
-        "d7omdev/nuget.nvim",
-        config = function()
-            require("nuget").setup()
-        end,
-    },
     {
         "folke/lazydev.nvim",
         ft = "lua", -- only load on lua files
@@ -48,13 +41,6 @@ return {
             },
         },
     },
-	{
-  'nvim-java/nvim-java',
-  config = function()
-    require('java').setup()
-    vim.lsp.enable('jdtls')
-  end,
-},
     { -- optional blink completion source for require statements and module annotations
         "saghen/blink.cmp",
 		version = '1.*',

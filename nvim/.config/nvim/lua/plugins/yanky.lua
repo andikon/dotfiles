@@ -23,11 +23,6 @@ function M.config()
 			timer = 200,
 		},
 	})
-
-	local hls = require("highlights")
-	hls.register_hls({
-		YankyPut = { default = true, link = "Search" },
-	})
 end
 
 return M
