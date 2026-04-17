@@ -27,8 +27,11 @@ return {
 
             vim.env.PATH = vim.env.PATH .. ";" .. roslynLspDllPath
             -- roslyn is handled via the plugin below
-            vim.lsp.enable({ "lua_ls", "angularls", "tailwindcss", "ts_ls", "clangd" })
+            vim.lsp.enable({ "lua_ls", "angularls", "tailwindcss", "ts_ls", "clangd", "jdtls" })
         end,
+    },
+    {
+        "mfussenegger/nvim-jdtls",
     },
     {
         "folke/lazydev.nvim",
