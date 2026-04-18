@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/bin/sh
 # Get list of sessions (quietly)
 SESSIONS=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
 
