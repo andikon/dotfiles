@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Usage: ./create_tmux_session.sh /path/to/project
 
