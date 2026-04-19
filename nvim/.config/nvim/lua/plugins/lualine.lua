@@ -6,14 +6,6 @@ local M = {
 }
 
 function M.config()
-    -- =========================================================================
-    -- COLOR SCHEME BLOCK
-    -- =========================================================================
-
-
-    -- =========================================================================
-    -- HELPER FUNCTIONS
-    -- =========================================================================
     local function pretty_dirpath()
         local path = vim.fn.expand("%:p")
         if path == "" then return "" end
@@ -57,48 +49,23 @@ function M.config()
         return sbar_chars[i] or sbar_chars[1]
     end
 
-local colors = {
-    bg      = '#171b1f', -- Main background
-    fg      = '#cfc9c2', -- Main text
-    section = '#3b4261', -- Background for Branch/Location
-    blue    = '#55bce9', -- Normal mode
-    green   = '#34eb9a', -- Insert mode
-    purple  = '#bb9af7', -- Visual mode
-    red     = '#ed728b', -- Replace/Macro mode
-    yellow  = '#e8d371', -- Command mode/Words
-}
-    -- =========================================================================
-    -- LUALINE SETUP
-    -- =========================================================================
+    local colors = {
+        bg      = '#171b1f', -- Main background
+        fg      = '#cfc9c2', -- Main text
+        section = '#3b4261', -- Background for Branch/Location
+        blue    = '#55bce9', -- Normal mode
+        green   = '#34eb9a', -- Insert mode
+        purple  = '#bb9af7', -- Visual mode
+        red     = '#ed728b', -- Replace/Macro mode
+        yellow  = '#e8d371', -- Command mode/Words
+    }
+
     require('lualine').setup({
         options = {
             section_separators = '',
             component_separators = '',
             globalstatus = true,
-            theme = {
-                normal = {
-                    a = { fg = colors.bg, bg = colors.blue, gui = 'bold' },
-                    b = { fg = colors.blue, bg = colors.section },
-                    c = { fg = colors.fg, bg = colors.bg },
-                },
-                insert = {
-                    a = { fg = colors.bg, bg = colors.green, gui = 'bold' },
-                },
-                visual = {
-                    a = { fg = colors.bg, bg = colors.purple, gui = 'bold' },
-                },
-                replace = {
-                    a = { fg = colors.bg, bg = colors.red, gui = 'bold' },
-                },
-                command = {
-                    a = { fg = colors.bg, bg = colors.yellow, gui = 'bold' },
-                },
-                inactive = {
-                    a = { fg = colors.fg, bg = colors.bg },
-                    b = { fg = colors.fg, bg = colors.bg },
-                    c = { fg = colors.fg, bg = colors.bg },
-                },
-            },
+            theme = 'vscode',
         },
         sections = {
             lualine_a = {

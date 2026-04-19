@@ -38,19 +38,18 @@ alias gl "git pull"
 
 
 function fish_prompt
-    # Exit status color (red if last command failed)
-    set_color normal
+    set_color brblack
+    printf "%s " (date "+%H:%M")
 
-    if test $status -ne 0
-        set_color red
-    else
-        set_color green
+    set_color cyan
+    printf "%s" (prompt_pwd)
+
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1; and begin
+        set_color yellow
+        printf " [%s]" (git branch --show-current)
     end
 
-    # Line 1: current working directory
-    echo (prompt_pwd)
-
-    # Line 2: prompt symbol
+    set_color green
+    printf " ❯ "
     set_color normal
-    echo -n "> "
 end

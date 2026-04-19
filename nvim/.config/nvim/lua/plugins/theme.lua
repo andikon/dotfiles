@@ -4,14 +4,19 @@ return
         "navarasu/onedark.nvim",
         config = function()
             require('onedark').setup {
-                style = 'warmer'
             }
         end
     },
     {
         'Mofiqul/vscode.nvim',
         config = function()
-            require('vscode').setup()
+            require('vscode').setup({
+                transparent = true,
+                italic_comments = true,
+                italic_inlayhints = true,
+                underline_links = true,
+                disable_nvimtree_bg = true,
+            })
         end
     },
     {

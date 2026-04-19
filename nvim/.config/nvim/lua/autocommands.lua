@@ -27,11 +27,11 @@ function M.setup()
 		end,
 	})
 	
--- vim.api.nvim_create_autocmd("TextYankPost", {
---    callback = function()
---        vim.hl.on_yank({ higroup = 'CurSearch', timeout = 300 })
---    end,
--- })
+    vim.api.nvim_create_autocmd("TextYankPost", {
+        callback = function()
+            vim.hl.on_yank({ higroup = 'CurSearch', timeout = 300 })
+        end,
+    })
 
 
 end
