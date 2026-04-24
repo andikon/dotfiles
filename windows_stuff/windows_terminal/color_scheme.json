@@ -20,4 +20,27 @@
     "selectionBackground": "#2f3546",
     "white": "#a9b1d6",
     "yellow": "#FFE77A"
+},
+{
+    "name": "Doom One",
+    "cursorColor": "#BBC2CF",
+    "selectionBackground": "#2257A0",
+    "background": "#282C34",
+    "foreground": "#BBC2CF",
+    "black": "#1B2229",
+    "blue": "#51AFEF",
+    "cyan": "#46D9FF",
+    "green": "#98BE65",
+    "purple": "#C678DD",
+    "red": "#FF6C6B",
+    "white": "#9CA0A4",
+    "yellow": "#ECBE7B",
+    "brightBlack": "#3F444A",
+    "brightBlue": "#2257A0",
+    "brightCyan": "#5699AF",
+    "brightGreen": "#4DB5BD",
+    "brightPurple": "#A9A1E1",
+    "brightRed": "#DA8548",
+    "brightWhite": "#DFDFDF",
+    "brightYellow": "#ECBE7B"
 }
