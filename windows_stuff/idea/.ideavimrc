@@ -27,6 +27,7 @@ nmap <leader>ss <Action>(SearchEverywhere)
 
 nmap <leader>gc <Action>(ActivateCommitToolWindow)
 nmap <leader>gg <Action>(Git.Branches)
+nmap <leader>gb <Action>(ActivateVersionControlToolWindow)
 
 nmap <leader>ca :action ShowIntentionActions<CR>
 nmap <leader>cg :action Generate<CR>
@@ -35,6 +36,10 @@ nmap <leader>cr :action RenameElement<CR>
 nmap <leader>cc <Action>(ActivateGitHubCopilotChatToolWindow)
 
 nmap <leader>tt <Action>(ActivateTerminalToolWindow)
+
+nmap <leader>z :action HideAllWindows<CR>
+nmap <leader>e :action ActivateProjectToolWindow<CR>
+nmap <leader>m :action ActivateMavenToolWindow<CR>
 
 nmap gd :action GotoDeclaration<CR>
 nmap gD :action GotoSuperMethod<CR>
