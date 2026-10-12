@@ -1,76 +1,77 @@
 return {
     {
-        "neovim/nvim-lspconfig", -- REQUIRED: for native Neovim LSP integration
-        lazy = false,            -- REQUIRED: tell lazy.nvim to start this plugin at startup
+        "neovim/nvim-lspconfig", -- provides the default server configs used by vim.lsp.enable
+        dependencies = { { "j-hui/fidget.nvim", opts = {} } }, -- LSP progress notifications
+    },
+    {
+        -- Installs the servers and enables them (jdtls is started per project by nvim-jdtls below).
+        "mason-org/mason-lspconfig.nvim",
         dependencies = {
-            { "j-hui/fidget.nvim", },
+            { "mason-org/mason.nvim", opts = {} },
+            "neovim/nvim-lspconfig",
         },
-        init = function()
-        end,
-        config = function()
-            -- Your LSP settings here
-            -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
-            function GetLspPath(lspPath)
-                local home = vim.fn.expand('$HOME')
-
-                local isLinux = string.find(home, "\\") == nil
-                if isLinux then
-                    local unixLspDirectory = "/.local/lsp"
-                    return unixLspDirectory .. lspPath
-                else
-                    local windowsLspDirectory = home .. "/languageservers"
-                    return string.gsub(windowsLspDirectory .. lspPath, "/", "\\")
-                end
-            end
-
-            local roslynLspDllPath = GetLspPath("/roslyn")
-
-            vim.env.PATH = vim.env.PATH .. ";" .. roslynLspDllPath
-            -- roslyn is handled via the plugin below
-            vim.lsp.enable({ "lua_ls", "angularls", "tailwindcss", "ts_ls", "clangd", "jdtls" })
-        end,
+        opts = {
+            ensure_installed = { "lua_ls", "ts_ls", "angularls", "tailwindcss", "clangd", "jdtls" },
+            automatic_enable = { exclude = { "jdtls" } },
+        },
     },
     {
         "mfussenegger/nvim-jdtls",
+        ft = "java",
+        dependencies = { "mason-org/mason.nvim" },
+        config = function()
+            local function start()
+                local root = vim.fs.root(0, { "gradlew", "mvnw", "pom.xml", "build.gradle", "build.gradle.kts", ".git" })
+                if not root then return end
+
+                local jdtls_bin = vim.fn.exepath("jdtls")
+                if jdtls_bin == "" then
+                    return vim.notify("jdtls is not installed yet, see :Mason", vim.log.levels.WARN)
+                end
+
+                -- jdtls needs its own workspace directory per project
+                local workspace = vim.fn.stdpath("cache") .. "/jdtls/workspace/" .. root:gsub("[/\\:]", "_")
+
+                require("jdtls").start_or_attach({
+                    cmd = { jdtls_bin, "-data", workspace },
+                    root_dir = root,
+                    capabilities = require("blink.cmp").get_lsp_capabilities(),
+                })
+            end
+
+            vim.api.nvim_create_autocmd("FileType", { pattern = "java", callback = start })
+            start()
+        end,
     },
     {
         "folke/lazydev.nvim",
-        ft = "lua", -- only load on lua files
+        ft = "lua",
         opts = {
             library = {
-                -- See the configuration section for more details
-                -- Load luvit types when the `vim.uv` word is found
                 { path = "${3rd}/luv/library", words = { "vim%.uv" } },
             },
         },
     },
-    { -- optional blink completion source for require statements and module annotations
+    {
         "saghen/blink.cmp",
-		version = '1.*',
+        version = "1.*",
         opts = {
             sources = {
-                -- add lazydev to your completion providers
                 default = { "lazydev", "lsp", "path", "snippets", "buffer" },
                 providers = {
                     lazydev = {
                         name = "LazyDev",
                         module = "lazydev.integrations.blink",
-                        -- make lazydev completions top priority (see `:h blink.cmp`)
-                        score_offset = 100,
+                        score_offset = 100, -- lazydev completions first
                     },
                 },
             },
-            keymap = { preset = 'enter' },
+            keymap = { preset = "enter" },
             completion = {
                 menu = { draw = { columns = { { "label", "label_description", gap = 1 }, { "kind" }, { "source_name" } } } },
-                documentation = {
-                    auto_show = true,
-                    auto_show_delay_ms = 500,
-                }
+                documentation = { auto_show = true, auto_show_delay_ms = 500 },
             },
-            signature = {
-                enabled = true,
-            },
+            signature = { enabled = true },
         },
-    }
+    },
 }

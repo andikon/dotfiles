@@ -10,7 +10,7 @@ return {
                     "java", "bash", "typst",
                 },
                 sync_install = true,
-                auto_install = false,
+                auto_install = true,
                 highlight = {
                     enable = true
                 },

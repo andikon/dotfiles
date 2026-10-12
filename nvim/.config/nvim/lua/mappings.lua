@@ -24,15 +24,6 @@ function M.setup()
     map("v", ">", ">gv", { desc = "Indent right" })
 
     -------------------------------------------------------------------
-    -- TABS
-    -------------------------------------------------------------------
-    map("n", "Q", "<cmd>tabclose<cr>", { desc = "Quit tab" })
-    map("n", "]t", "<cmd>tabnext<cr>", { desc = "Next tab" })
-    map("n", "[t", "<cmd>tabprev<cr>", { desc = "Prev tab" })
-    map("n", "<leader>tn", "<cmd>tabnew<cr>", { desc = "New tab" })
-    map("n", "<leader>tc", "<cmd>tabclose<cr>", { desc = "Close current tab" })
-
-    -------------------------------------------------------------------
     -- TEXT MANIPULATION
     -------------------------------------------------------------------
     -- Move selected block
