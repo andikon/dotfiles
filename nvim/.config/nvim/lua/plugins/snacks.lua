@@ -132,7 +132,7 @@ return {
     input = { enabled = true },
     notifier = {
       enabled = true,
-     timeout = 3000,
+     timeout = 6000,
     },
     picker = { 
         enabled = true, 

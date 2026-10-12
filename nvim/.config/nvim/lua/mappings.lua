@@ -43,6 +43,11 @@ function M.setup()
     -------------------------------------------------------------------
     -- LSP
     -------------------------------------------------------------------
+    map("n", "gd", function() Snacks.picker.lsp_definitions() end, { desc = "Go to definition" })
+    map("n", "gD", function() Snacks.picker.lsp_declarations() end, { desc = "Go to declaration" })
+    map("n", "gI", function() Snacks.picker.lsp_implementations() end, { desc = "Go to implementation" })
+    map("n", "gr", function() Snacks.picker.lsp_references() end, { desc = "Go to references" })
+
     map("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
     map("n", "gk", vim.lsp.buf.signature_help, { desc = "Signature help" })
     map("n", "ge", vim.diagnostic.open_float, { desc = "Diagnostics float" })

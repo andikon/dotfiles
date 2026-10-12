@@ -1,7 +1,15 @@
 local M = {
 	"rachartier/tiny-inline-diagnostic.nvim",
-	event = "LspAttach", -- Or VeryLazy
-	enabled = false, -- promising idea, but works very unreliably
+	event = "LspAttach",
+	keys = {
+		{
+			"<leader>ud",
+			function()
+				require("tiny-inline-diagnostic").toggle()
+			end,
+			desc = "Toggle inline diagnostics",
+		},
+	},
 }
 
 function M.config()
