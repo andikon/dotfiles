@@ -21,7 +21,8 @@ return {
         dependencies = { "mason-org/mason.nvim" },
         config = function()
             local function start()
-                local root = vim.fs.root(0, { "gradlew", "mvnw", "pom.xml", "build.gradle", "build.gradle.kts", ".git" })
+                -- Git root, so every module of a multi-module repo is imported.
+                local root = vim.fs.root(0, { ".git" })
                 if not root then return end
 
                 local jdtls_bin = vim.fn.exepath("jdtls")
@@ -66,6 +67,7 @@ return {
                     },
                 },
             },
+            fuzzy = { implementation = "lua" },
             keymap = { preset = "enter" },
             completion = {
                 menu = { draw = { columns = { { "label", "label_description", gap = 1 }, { "kind" }, { "source_name" } } } },

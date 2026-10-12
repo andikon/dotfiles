@@ -5,12 +5,10 @@ return {
         build = ":TSUpdate",
         config = function()
             require("nvim-treesitter.configs").setup({
-                ensure_installed = {
-                    "vimdoc", "javascript", "typescript", "c", "c_sharp", "lua", "cpp", "cmake",
-                    "java", "bash", "typst",
-                },
-                sync_install = true,
-                auto_install = true,
+                -- No C compiler on this machine, so parsers can't be built.
+                ensure_installed = {},
+                sync_install = false,
+                auto_install = false,
                 highlight = {
                     enable = true
                 },

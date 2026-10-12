@@ -180,9 +180,9 @@ return {
     { "<leader>su", function() Snacks.picker.undo() end, desc = "Undo History" },
 	
     -- terminal
-    { "<C-/>", function() Snacks.terminal() end, mode = { "n", "t" }, desc = "Toggle Terminal" },
-    { "<leader>tt", function() Snacks.terminal() end, desc = "Toggle Terminal" },
-    { "<leader>tn", function() Snacks.terminal(nil, { count = #Snacks.terminal.list() + 1 }) end, desc = "New Terminal" },
+    { "<C-/>", function() Snacks.terminal("pwsh") end, mode = { "n", "t" }, desc = "Toggle Terminal" },
+    { "<leader>tt", function() Snacks.terminal("pwsh") end, desc = "Toggle Terminal" },
+    { "<leader>tn", function() Snacks.terminal("pwsh", { count = #Snacks.terminal.list() + 1 }) end, desc = "New Terminal" },
     {
       "<leader>tp",
       function()
