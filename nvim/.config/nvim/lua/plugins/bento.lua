@@ -5,7 +5,9 @@ local M = {
 
 function M.config()
 	require("bento").setup({
-		max_open_buffers = 10,
+		-- Other open project tabs must retain their buffers.
+		max_open_buffers = nil,
+		main_keymap = "<leader>bb",
 		map_last_accessed = false,
 	})
 end

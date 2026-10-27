@@ -27,9 +27,12 @@ end
 function M.switch_to(path, repo)
   if same_path(path, repo.toplevel) then return notify("Already in this worktree") end
 
-  local file = vim.api.nvim_buf_get_name(0)
-  local rel = repo.toplevel and file:find(repo.toplevel, 1, true) == 1 and vim.fs.normalize(file):sub(#repo.toplevel + 2)
-  vim.cmd.cd(vim.fn.fnameescape(path))
+  local file = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
+  local prefix = repo.toplevel and (vim.fs.normalize(repo.toplevel):gsub("/+$", "") .. "/")
+  local candidate = vim.fn.has("win32") == 1 and file:lower() or file
+  local match = prefix and (vim.fn.has("win32") == 1 and prefix:lower() or prefix)
+  local rel = match and candidate:sub(1, #match) == match and file:sub(#prefix + 1)
+  require("projects").open(path)
   if rel and rel ~= "" and not vim.bo.modified and vim.uv.fs_stat(path .. "/" .. rel) then
     vim.cmd.edit(vim.fn.fnameescape(path .. "/" .. rel))
   end
@@ -72,6 +75,12 @@ end
 
 ---@param wt worktree.Worktree
 function M.remove(wt, repo)
+  if require("agents").running(wt.path) > 0 then return notify("Stop the jobs in this worktree before removing it", vim.log.levels.WARN) end
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    if vim.t[tab].project_root and same_path(vim.t[tab].project_root, wt.path) then
+      return notify("Close this worktree's project tab before removing it", vim.log.levels.WARN)
+    end
+  end
   if same_path(wt.path, repo.toplevel) then return notify("Cannot remove the current worktree", vim.log.levels.WARN) end
   if same_path(wt.path, repo.main_dir) then return notify("Cannot remove the main worktree", vim.log.levels.WARN) end
   local ok, _, err = git.run({ "worktree", "remove", wt.path })

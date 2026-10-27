@@ -14,7 +14,9 @@ function M.setup()
     vim.opt.backup = false -- creates a backup file
     vim.opt.cmdheight = 2 -- space in the neovim command line for displaying messages
     vim.opt.fileencoding = "utf-8" -- the encoding written to a file
-    vim.opt.showtabline = 0 -- always show tabs
+    vim.opt.showtabline = 2
+    vim.opt.hidden = true
+    vim.opt.autoread = true
     vim.opt.smartcase = true -- smart case
     vim.opt.smartindent = true -- makes indenting smarter
     vim.opt.autoindent = true -- makes indenting automatic
@@ -34,14 +36,20 @@ function M.setup()
     vim.opt.cursorline = true -- highlight the current line
     vim.opt.number = true -- set numbered lines
     vim.opt.relativenumber = false -- set relative numbered lines
-    vim.opt.signcolumn = "yes" -- always show the sign column, otherwise it would shift the text each time
+    vim.opt.signcolumn = "yes:1"
+    vim.opt.foldcolumn = "1"
+    vim.opt.foldlevel = 99
+    vim.opt.foldlevelstart = 99
     vim.opt.wrap = true -- display lines as one long line
     vim.opt.laststatus = 3 -- display one statusline for all windows
     vim.opt.splitkeep = "screen"
     vim.opt.pumblend = 10 -- popups transparency
     vim.opt.pumheight = 10 -- maximum number of entries in a popup
     vim.opt.winblend = 10 -- floating windows transparency
-    vim.opt.winborder = "none" -- default window border style
+    vim.opt.winborder = "rounded"
+    vim.opt.completeopt = { "menu", "menuone", "noselect", "popup" }
+    vim.diagnostic.config({ virtual_text = false, virtual_lines = false, severity_sort = true,
+        float = { border = "rounded", source = "if_many" } })
     vim.opt.termsync = false -- don't sync neovim with terminal emulator
 
 end

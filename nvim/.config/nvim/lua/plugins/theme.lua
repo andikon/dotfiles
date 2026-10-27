@@ -1,6 +1,20 @@
 return
 {
     {
+        "NTBBloodbath/doom-one.nvim",
+        lazy = false,
+        priority = 1100,
+        init = function()
+            vim.opt.background = "dark"
+            vim.g.doom_one_terminal_colors = true
+            vim.g.doom_one_italic_comments = true
+            vim.g.doom_one_enable_treesitter = true
+            vim.g.doom_one_transparent_background = false
+            vim.g.doom_one_diagnostics_text_color = true
+            vim.g.doom_one_plugin_whichkey = true
+        end,
+    },
+    {
         "navarasu/onedark.nvim",
         config = function()
             require('onedark').setup {
@@ -9,9 +23,10 @@ return
     },
     {
         'Mofiqul/vscode.nvim',
+        lazy = true,
         config = function()
             require('vscode').setup({
-                transparent = true,
+                transparent = false,
                 italic_comments = true,
                 italic_inlayhints = true,
                 underline_links = true,
@@ -29,13 +44,11 @@ return
     },
     {
         "folke/tokyonight.nvim",
-        lazy = false,
-        priority = 1000,
+        lazy = true,
     },
     {
         'sainnhe/gruvbox-material',
-        lazy = false,
-        priority = 1000,
+        lazy = true,
         config = function()
             -- Optionally configure and load the colorscheme
             -- directly inside the plugin declaration.

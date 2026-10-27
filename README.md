@@ -1,5 +1,7 @@
 # my dotfiles
 
+Neovim: [Java and agent workflow](nvim/README.md) · [PDF cheatsheet](output/pdf/neovim-workflow-cheatsheet.pdf).
+
 This repository is organized for GNU Stow. Use stow to create symlinks from this repo into your home directory.
 
 Usage:

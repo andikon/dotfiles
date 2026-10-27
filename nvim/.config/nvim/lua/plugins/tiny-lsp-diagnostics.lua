@@ -1,5 +1,6 @@
 local M = {
 	"rachartier/tiny-inline-diagnostic.nvim",
+	enabled = false, -- Preserve the live config's preference for built-in diagnostic views.
 	event = "LspAttach",
 	keys = {
 		{
@@ -13,6 +14,7 @@ local M = {
 }
 
 function M.config()
+	vim.diagnostic.config({ virtual_text = false })
 	local icons = require("icons")
 
 	require("tiny-inline-diagnostic").setup({

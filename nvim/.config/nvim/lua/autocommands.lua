@@ -2,6 +2,13 @@ local M = {}
 
 function M.setup()
 
+    vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
+        group = vim.api.nvim_create_augroup("AgentFileReload", { clear = true }),
+        callback = function()
+            if vim.fn.getcmdwintype() == "" then vim.cmd("silent! checktime") end
+        end,
+    })
+
 -- Close some filetypes with <q>
 	vim.api.nvim_create_autocmd("FileType", {
 		group = vim.api.nvim_create_augroup("close_with_q", { clear = true }),

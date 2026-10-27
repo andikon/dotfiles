@@ -1,125 +1,38 @@
-local icons = require("icons")
-
-local M = {
+return {
     "nvim-lualine/lualine.nvim",
     lazy = false,
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+        local c = require("ui").colors
+        local function servers()
+            local names = {}
+            for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do names[#names + 1] = client.name end
+            return table.concat(names, ", ")
+        end
+        require("lualine").setup({
+            options = {
+                globalstatus = true, component_separators = "", section_separators = "",
+                theme = {
+                    normal = { a = { fg = c.bg, bg = c.blue, gui = "bold" }, b = { fg = c.fg, bg = c.raised }, c = { fg = c.muted, bg = c.bg } },
+                    insert = { a = { fg = c.bg, bg = c.green, gui = "bold" } },
+                    visual = { a = { fg = c.bg, bg = c.purple, gui = "bold" } },
+                    replace = { a = { fg = c.bg, bg = c.red, gui = "bold" } },
+                    command = { a = { fg = c.bg, bg = c.yellow, gui = "bold" } },
+                    inactive = { a = { fg = c.muted, bg = c.bg }, b = { fg = c.muted, bg = c.bg }, c = { fg = c.muted, bg = c.bg } },
+                },
+            },
+            sections = {
+                lualine_a = { { "mode", fmt = function(s) return s:sub(1, 1) end } },
+                lualine_b = { { function() return vim.fs.basename(vim.fn.getcwd()) end, icon = "󰉋" }, "branch", "diff" },
+                lualine_c = { { "filename", path = 1 }, { "diagnostics", symbols = { error = "E:", warn = "W:", info = "I:", hint = "H:" } } },
+                lualine_x = {
+                    { function() return require("agents").status() end, color = { fg = c.green } },
+                    { function() return vim.lsp.status() end, cond = function() return vim.o.columns > 130 end },
+                    { servers, color = { fg = c.blue } }, "searchcount",
+                },
+                lualine_y = { "filetype", "location" }, lualine_z = { "progress" },
+            },
+            extensions = { "quickfix", "lazy", "mason" },
+        })
+    end,
 }
-
-function M.config()
-    local function pretty_dirpath()
-        local path = vim.fn.expand("%:p")
-        if path == "" then return "" end
-        local cwd = vim.fn.getcwd()
-
-        if path:find(cwd, 1, true) == 1 then
-            path = path:sub(#cwd + 2)
-        end
-
-        local sep = package.config:sub(1, 1)
-        local parts = vim.split(path, "[\\/]")
-        table.remove(parts)
-        if #parts > 3 then
-            parts = { parts[1], "…", parts[#parts - 1], parts[#parts] }
-        end
-        return #parts > 0 and (table.concat(parts, sep)) or ""
-    end
-
-    local function get_words()
-        local ft = vim.bo.filetype
-        if ft == "md" or ft == "text" or ft == "markdown" then
-            local count = vim.fn.wordcount()
-            local wc = count.visual_words or count.words
-            return " " .. " " .. tostring(wc) .. " "
-        end
-        return ""
-    end
-
-    local function fileinfo()
-        local dir = pretty_dirpath()
-        local name = vim.fn.expand("%:t")
-        if name == "" then name = "[No Name]" end
-        return dir .. "/" .. "%#Bold#" .. name .. "%#lualine_c_normal#" .. " %m%r%h%w "
-    end
-
-    local function scrollbar()
-        local sbar_chars = { "󰋙", "󰫃", "󰫄", "󰫅", "󰫆", "󰫇", "󰫈" }
-        local cur_line = vim.api.nvim_win_get_cursor(0)[1]
-        local lines = vim.api.nvim_buf_line_count(0)
-        local i = math.floor((cur_line - 1) / (lines > 0 and lines or 1) * #sbar_chars) + 1
-        return sbar_chars[i] or sbar_chars[1]
-    end
-
-    local colors = {
-        bg      = '#171b1f', -- Main background
-        fg      = '#cfc9c2', -- Main text
-        section = '#3b4261', -- Background for Branch/Location
-        blue    = '#55bce9', -- Normal mode
-        green   = '#34eb9a', -- Insert mode
-        purple  = '#bb9af7', -- Visual mode
-        red     = '#ed728b', -- Replace/Macro mode
-        yellow  = '#e8d371', -- Command mode/Words
-    }
-
-    require('lualine').setup({
-        options = {
-            section_separators = '',
-            component_separators = '',
-            globalstatus = true,
-            theme = 'vscode',
-        },
-        sections = {
-            lualine_a = {
-                {
-                    "mode",
-                    fmt = function(str)
-                        local m = vim.api.nvim_get_mode().mode
-                        return m == "\22" and "C-V" or str:sub(1, 1)
-                    end,
-                },
-            },
-            lualine_b = {
-                { "branch", icon = "" },
-                "diff",
-            },
-            lualine_c = {
-                { fileinfo, padding = { left = 1, right = 0 } },
-            },
-            lualine_x = {
-                { function() return require("lsp-progress").progress() end },
-                "searchcount",
-                {
-                    function()
-                        local msg = ""
-                        local buf_ft = vim.api.nvim_get_option_value('filetype', { buf = 0 })
-                        local clients = vim.lsp.get_clients({ bufnr = 0 })
-                        if next(clients) == nil then return msg end
-                        for _, client in ipairs(clients) do
-                            if client.name ~= "null-ls" then return "󰄭  " .. client.name end
-                        end
-                        return msg
-                    end,
-                },
-            },
-            lualine_y = {
-                {
-                    get_words,
-                    color = { fg = colors.darkblue, bg = colors.cyan },
-                },
-                "location",
-                { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-                { function() return vim.bo.filetype:upper() end, padding = { left = 0, right = 1 } },
-            },
-            lualine_z = {
-                {
-                    "progress",
-                    fmt = function()
-                        local lines = vim.api.nvim_buf_line_count(0)
-                        return lines .. " " .. scrollbar()
-                    end,
-                },
-            },
-        },
-    })
-end
-
-return M
