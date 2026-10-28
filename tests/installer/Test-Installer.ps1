@@ -32,7 +32,21 @@ try {
     & $entryPoint -Restore $backup -Yes -HomeDirectory $homeFixture
     Write-Host 'PASS: read-only preview, exact replacement, shared-directory ownership, backups and repeatable restore.'
 
+    $normalWeztermHome = Join-Path $fixture 'normal-wezterm'
+    $legacyWezterm = Join-Path $normalWeztermHome '.wezterm.lua'
+    Write-Fixture $legacyWezterm 'return { font_size = 19 }'
+    & $entryPoint -Only wezterm -Yes -SkipDependencies -HomeDirectory $normalWeztermHome -DryRun
+    Assert (Test-Path -LiteralPath $legacyWezterm) 'Preview changed the legacy WezTerm config.'
+    & $entryPoint -Only wezterm -Yes -SkipDependencies -HomeDirectory $normalWeztermHome
+    Assert (-not (Test-Path -LiteralPath $legacyWezterm)) 'Legacy .wezterm.lua still shadows the installed WezTerm configuration.'
+    Assert (Test-Path -LiteralPath (Join-Path $normalWeztermHome '.config/wezterm/wezterm.lua')) 'Canonical WezTerm configuration was not installed.'
+    & $entryPoint -Restore (Latest-Backup $normalWeztermHome) -Yes -HomeDirectory $normalWeztermHome
+    Assert ((Get-Content -LiteralPath $legacyWezterm -Raw) -eq 'return { font_size = 19 }') 'Restore did not recover the legacy WezTerm config.'
+    Write-Host 'PASS: normal WezTerm installation removes the shadowing legacy config with a restorable backup.'
+
     $portable = Join-Path $homeFixture 'Portable WezTerm'
+    $portableHomeConfig = Join-Path $homeFixture '.wezterm.lua'
+    Write-Fixture $portableHomeConfig 'return { font_size = 21 }'
     Write-Fixture (Join-Path $portable 'wezterm.exe') 'portable distribution fixture'
     Write-Fixture (Join-Path $portable 'local.lua') 'return { opacity = 1.0 }'
     Write-Fixture (Join-Path $portable 'scripts/obsolete.ps1') 'old script'
@@ -41,6 +55,7 @@ try {
     Assert (-not (Test-Path -LiteralPath (Join-Path $portable 'local.lua'))) 'Local override survived explicit replacement.'
     Assert (-not (Test-Path -LiteralPath (Join-Path $portable 'scripts/obsolete.ps1'))) 'A stale managed script survived.'
     Assert ((Get-Content -LiteralPath (Join-Path $portable 'unrelated.dll') -Raw) -eq 'application file') 'Portable application files changed.'
+    Assert ((Get-Content -LiteralPath $portableHomeConfig -Raw) -eq 'return { font_size = 21 }') 'Portable installation changed the separate home config.'
     & $entryPoint -Restore (Latest-Backup $homeFixture) -Yes -HomeDirectory $homeFixture -WezTermDirectory $portable
     Assert (Test-Path -LiteralPath (Join-Path $portable 'local.lua')) 'Portable local override was not recoverable.'
     Write-Host 'PASS: portable WezTerm replaces config and preserves executable/library files.'

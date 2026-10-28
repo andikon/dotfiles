@@ -8,6 +8,7 @@
 - `catalog/targets.tsv` declares file, directory, or `absent` targets. `absent` means back up and remove a conflicting config file.
 - `catalog/packages.tsv` maps tools/dependencies to package identifiers. `-` means manual installation. Homebrew entries may start with `--cask`.
 - `installer/` contains native PowerShell and Bash implementations with matching behavior.
+- The PowerShell Workbench separates console I/O (`Terminal.ps1`), page state (`WorkbenchModel.ps1`), frame composition (`WorkbenchFrame.ps1`), and the wizard loop (`Workbench.ps1`). `Apply.ps1` is the installation/backup engine shared with plain mode. Keep rendering and navigation free of package or configuration mutations.
 - `docs/tools/` describes how to use each setup; `tests/` validates installation and the Windows workspace workflow.
 - `windows_stuff/install.ps1` is a compatibility entry point for old commands.
 
@@ -37,11 +38,15 @@ On Windows:
 ```powershell
 python tests/installer/validate_catalog.py
 powershell -NoProfile -File tests/installer/Test-Installer.ps1
+powershell -NoProfile -File tests/installer/Test-Workbench.ps1
 pwsh -NoProfile -File tests/installer/Test-Installer.ps1
+pwsh -NoProfile -File tests/installer/Test-Workbench.ps1
 pwsh -NoProfile -File tests/wezterm/Verify-WezTerm.ps1
 ```
 
 The Bash suite covers Linux/WSL and macOS path behavior, replacement, restoration, cancellation, minimum versions, simulated package installs, and clone-free download behavior. CI runs it natively on Linux and macOS, with `/bin/bash` used to cover macOS's bundled Bash. The Windows suite covers Windows PowerShell 5.1 and PowerShell 7, directory junctions, portable WezTerm, rollback, and shared-directory ownership.
+
+Workbench tests drive the real page state, frame renderer, and wizard through a scripted console adapter. They cover queued software, back navigation, exclusions, cancel confirmation, preview safety, terminal geometry, wide text, error cleanup, and applying through the real engine in a temporary home. For visual checks, run `./install.ps1 -DryRun` in an interactive terminal; use a compact and a wide window and inspect all five pages without applying settings.
 
 The WezTerm suite also loads the installed WezTerm configuration and checks Lua behavior when those programs are available. `-Runtime` explicitly starts disposable native mux panes for deeper workspace checks; it requires local WezTerm and PowerShell 7.
 

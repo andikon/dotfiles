@@ -19,6 +19,16 @@ From PowerShell 7 in the dotfiles repository:
 
 Without `-WezTermDirectory`, the destination is `$XDG_CONFIG_HOME/wezterm` if set, otherwise `%USERPROFILE%/.config/wezterm`. The installer replaces the displayed config targets completely and stores timestamped backups. It prepares the default project index during a normal installation so the first picker can open immediately. `-WhatIf` previews the installation, and `-SkipDependencies` leaves software installation to you. See [installation options](../installation.md).
 
+Normal installation also backs up and removes `%USERPROFILE%/.wezterm.lua`. The supported stable WezTerm release `20240203-110809-5046fc22` checks that file before the config directory, so leaving an old copy there makes the new configuration appear not to apply. Portable installation leaves the separate home file untouched. See the [loading order in that release](https://github.com/wezterm/wezterm/blob/20240203-110809-5046fc22/config/src/config.rs#L959).
+
+After switching from the legacy file, save your terminal work and fully close/reopen WezTerm so it discovers the new config location. To apply only WezTerm from this checkout:
+
+```powershell
+.\install.ps1 -Only wezterm -Yes -SkipDependencies
+```
+
+To check which file a running window uses, open WezTerm's debug overlay with Ctrl+Shift+L and evaluate `wezterm.config_file`. The normal destination should end in `.config/wezterm/wezterm.lua` unless you selected an XDG or portable location. An explicit `--config-file`, `WEZTERM_CONFIG_FILE`, or application-local portable config can select a different file.
+
 For a fully manual portable setup, copy the contents of `config/wezterm/windows` beside `wezterm.exe`. WezTerm finds that `wezterm.lua` automatically. No files refer back to this repository. A command-line `--config-file` or `WEZTERM_CONFIG_FILE` environment override takes precedence over portable discovery.
 
 Copy `local.lua.example` to `local.lua` to override project roots, portable executable paths, font, size or opacity. Use forward slashes in Lua paths. Full replacement backs up and resets `local.lua`; reapply deliberate local preferences after replacing, or skip this configuration. No authentication credentials belong in this file.

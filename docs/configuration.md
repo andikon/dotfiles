@@ -8,6 +8,8 @@ Shared directories use individual targets: VS Code's `settings.json` and `keybin
 
 Portable WezTerm owns its named config files and `scripts` directory. Unknown application files outside that set are left alone. Its local override file is included in replacement: back it up, replace, or skip the WezTerm configuration.
 
+Normal WezTerm installation additionally owns removal of the legacy `~/.wezterm.lua` file so it cannot shadow the installed directory. That file goes into the same restorable backup run. A portable installation leaves the separate home configuration untouched.
+
 ## Backups and restore
 
 Each applying run creates a journal and moves previous targets into a timestamped backup directory. Moving preserves top-level symlinks and junctions without changing their source. A failure rolls back changes for the affected tool; successfully applied independent tools stay installed.

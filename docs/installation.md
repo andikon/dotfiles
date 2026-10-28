@@ -10,7 +10,13 @@ Use the commands in the [README](../README.md) for an interactive installation. 
 | macOS | Bash 3.2+ | curl and tar |
 | Linux / WSL | Bash 3.2+ | curl and tar |
 
-The terminal interface has no framework dependency. Color is optional; Bash honors `NO_COLOR`. Arrows and Space work in interactive terminals, and numbered selection works when input is redirected. Set `DOTFILES_NO_TUI=1` to force numbered prompts. Press Esc or enter `cancel` in a selection menu to stop; enter `none` to skip all its entries.
+The terminal interface has no framework dependency. On Windows, an interactive console of at least 72 columns by 22 rows opens the full-screen Workbench wizard. Inspect, Dependencies, Configs, Review, and Finish each occupy their own terminal page. Wide consoles show a details pane beside the list; compact consoles use `Tab` to switch between them. Lists scroll to keep the focused item visible. Resizing preserves your choices, and a very small window pauses navigation until you enlarge it.
+
+Use arrows to move, `Space` to select, `A` to toggle all eligible entries, `Enter` to continue, `Backspace` to return, and `?` for help. `Tab` switches focus to details; arrows and Page Up/Down scroll long paths and messages. Keys `1`-`4` jump to visited pages. `Esc` opens a cancellation choice that defaults to keeping your edits. On Finish, `Esc` or `Enter` returns to the shell. The previous console content, colors, cursor visibility, and input mode are restored on exit, including error exits.
+
+PowerShell software and configuration choices are queued until the Review page is applied. Package output stays on the progress page, and noninteractive WinGet attempts that need permissions or agreements are reported for manual handling. Program detection and minimum-version checks run again after each package attempt. Configuration files can still be staged for manually installed programs.
+
+Use `-Plain` or set `DOTFILES_NO_TUI=1` to force numbered PowerShell prompts. Redirected input/output and small initial consoles also use the plain interface. Bash keeps its lightweight selection menu and honors `NO_COLOR`. Enter `cancel` in a numbered selection menu to stop, or `none` to skip all its entries.
 
 Dependency installation happens only after choosing that option in the wizard and selecting the software. `-Yes` / `--yes` applies an explicit configuration list and **never installs software automatically**. Missing requirements leave configurations unchecked by default, but they can be selected for staging. `-SkipMissing` / `--skip-missing` excludes them entirely. Optional dependencies do not block a configuration.
 
@@ -23,6 +29,7 @@ Dependency installation happens only after choosing that option in the wizard an
 | Manage software yourself | `-SkipDependencies` | `--skip-dependencies` |
 | Skip missing requirements | `-SkipMissing` | `--skip-missing` |
 | Preview only | `-DryRun` or `-WhatIf` | `--dry-run` |
+| Force numbered prompts | `-Plain` | `DOTFILES_NO_TUI=1` |
 | Stage into another home | `-HomeDirectory C:\Temp\dotfiles-home` | `--home /tmp/dotfiles-home` |
 | Restore a backup run | `-Restore PATH` | `--restore PATH` |
 | Download a snapshot from a checkout | `-Remote` | `--remote` |
@@ -32,6 +39,8 @@ Dependency installation happens only after choosing that option in the wizard an
 Tool IDs are in [the tool catalog](../catalog/tools.tsv). Bash accepts the exact lowercase IDs. PowerShell additionally accepts the old `Neovim` and `WindowsTerminal` names. `windows_stuff/install.ps1` forwards old commands into the new wizard; its replacement behavior follows the new installer.
 
 `-HomeDirectory` / `--home` stages settings under the supplied home and ignores the current user's XDG and application path overrides. It still detects available software, but skips WezTerm index warming. This is useful for evaluating the setup without touching active settings. Explicit destination flags still override staged paths.
+
+In an interactive Windows terminal, `-DryRun` lets you walk through all five Workbench pages with actual tool detection and destinations. The last action is **Finish preview**, which never invokes package installation, configuration replacement, or backup creation. With redirected output or `-Plain`, it prints the read-only report instead.
 
 ## Pin a version
 
@@ -77,6 +86,8 @@ Java versions are project-specific, and coding agent CLIs require account setup.
 Installed Windows Terminal stable, preview, and unpackaged configuration directories are detected separately; all discovered targets appear in the review. PowerShell 7's profile path is queried from that shell to account for redirected Documents folders. These profiles target PowerShell 7, even when Windows PowerShell 5.1 launches the wizard.
 
 `XDG_CONFIG_HOME`, `NVIM_APPNAME`, `VSCODE_PORTABLE`, and `GLAZEWM_CONFIG_PATH` are honored where applicable. A portable WezTerm directory owns the listed Lua config files and its `scripts` directory; executables and libraries remain untouched. Its `local.lua` is backed up and removed during replacement.
+
+Normal WezTerm installation also backs up/removes `~/.wezterm.lua`, which takes precedence over the config directory in the supported stable release. Portable installation leaves that home file alone. After changing the config location, save your terminal work and close/reopen WezTerm; its debug overlay can report the active path with `wezterm.config_file`.
 
 If you launch an application with an explicit configuration-file argument, select its destination explicitly where supported or copy the appropriate config manually. Executable detection cannot infer arbitrary launcher arguments.
 

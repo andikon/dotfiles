@@ -6,6 +6,7 @@ param(
     [switch]$SkipDependencies,
     [switch]$SkipMissing,
     [switch]$DryRun,
+    [switch]$Plain,
     [string]$HomeDirectory,
     [string]$WezTermDirectory,
     [string]$VSCodeDirectory,
@@ -41,6 +42,8 @@ try {
         HomeDirectory = $HomeDirectory; WezTermDirectory = $WezTermDirectory
         VSCodeDirectory = $VSCodeDirectory; TerminalDirectory = $TerminalDirectory; Restore = $Restore
     }
+    # A pinned older snapshot may predate the Workbench/Plain switch.
+    if ((Get-Command Invoke-DotfilesInstaller).Parameters.ContainsKey('Plain')) { $options.Plain = [bool]$Plain }
     Invoke-DotfilesInstaller @options
 } finally {
     if ($temporaryRoot) {

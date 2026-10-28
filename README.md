@@ -9,9 +9,7 @@ These commands use the published `main` branch of [andikon/dotfiles](https://git
 **Windows — run in PowerShell:**
 
 ```powershell
-$installer = Join-Path $env:TEMP 'dotfiles-install.ps1'
-Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/andikon/dotfiles/main/install.ps1' -OutFile $installer
-& $installer
+$installer = Join-Path $env:TEMP 'dotfiles-install.ps1'; Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/andikon/dotfiles/main/install.ps1' -OutFile $installer -ErrorAction Stop; & $installer
 ```
 
 **macOS, Linux, or WSL — run in your terminal:**
@@ -30,6 +28,9 @@ The wizard runs with Windows PowerShell 5.1+ or Bash 3.2+. It downloads a tempor
 2. Offers to install selected dependencies, let you handle them yourself, or skip tools with missing requirements.
 3. Shows configuration destinations and whether existing settings will be replaced. Select entries with arrows and Space, or use numbered prompts in a basic terminal.
 4. Shows the final selection and asks you to apply it.
+5. Reports the results and the backup location.
+
+Windows uses the full-screen **Workbench** interface: each step has its own page, with a step sidebar, focused tool details, and a keyboard footer. Software and configuration choices stay queued until Review. Use `Tab` for details, `Backspace` to go back, and `Esc` to cancel. The interface uses native PowerShell and requires no extra packages. Basic or redirected terminals fall back to numbered prompts.
 
 **Replacement is complete within the displayed target.** Stale files in a managed directory are removed, and existing settings are backed up first. VS Code settings and PowerShell modules are managed individually so unrelated files in shared folders remain available. Choosing Skip leaves that configuration untouched.
 
@@ -51,6 +52,9 @@ The WezTerm workspace configuration currently targets native Windows. macOS/Linu
 ```powershell
 # Preview: no configurations, backups, or packages are changed.
 .\install.ps1 -DryRun
+
+# Force numbered prompts instead of the Workbench interface.
+.\install.ps1 -Plain
 
 # Start the wizard; leave dependencies to the company portal.
 .\install.ps1 -SkipDependencies

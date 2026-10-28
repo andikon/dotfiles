@@ -123,6 +123,8 @@ function Get-DotfilesStatus($Context, [string]$Id) {
 function Get-DotfilesTargets($Context, [string]$Tool) {
     foreach ($row in $Context.Targets) {
         if ($row.tool -ne $Tool -or -not (Test-DotfilesPlatform $row 'windows')) { continue }
+        # Portable installation owns its application-local config, not a separate home setup.
+        if ($Tool -eq 'wezterm' -and $Context.Portable -and -not $row.destination.StartsWith('{WEZTERM}')) { continue }
         foreach ($placeholder in [regex]::Matches($row.destination, '\{([^}]+)\}')) {
             if ($placeholder.Groups[1].Value -ne 'TERMINAL' -and -not $Context.Variables.ContainsKey($placeholder.Groups[1].Value)) { throw "Unknown destination variable: $($placeholder.Value)" }
         }

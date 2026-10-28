@@ -7,37 +7,6 @@ function Read-DotfilesSelection([object[]]$Items, [string]$Title) {
     if ($Items.Count -eq 0) { return @() }
     Write-Host "`n$Title" -ForegroundColor Cyan
     $selected = @($Items | ForEach-Object { [bool]$_.Default })
-    $useKeys = $false
-    try { $useKeys = $env:DOTFILES_NO_TUI -ne '1' -and -not [Console]::IsInputRedirected -and [Console]::WindowHeight -gt 16 -and [Console]::WindowWidth -gt 40 } catch { }
-    if ($useKeys) {
-        $height = [Math]::Min(10, $Items.Count)
-        Write-Host 'Arrows: move | Space: select | A: all | Enter: continue | Esc: cancel'
-        for ($i = 0; $i -lt $height; $i++) { Write-Host '' }
-        $top = [Console]::CursorTop - $height
-        $cursor = 0
-        while ($true) {
-            $start = [Math]::Max(0, [Math]::Min($cursor - $height + 1, $Items.Count - $height))
-            [Console]::SetCursorPosition(0, $top)
-            for ($row = 0; $row -lt $height; $row++) {
-                $index = $start + $row
-                $mark = if ($selected[$index]) { 'x' } else { ' ' }
-                $arrow = if ($index -eq $cursor) { '>' } else { ' ' }
-                $line = "$arrow [$mark] $($Items[$index].Label)"
-                $width = [Math]::Max(20, [Console]::WindowWidth - 1)
-                if ($line.Length -gt $width) { $line = $line.Substring(0, $width - 3) + '...' }
-                Write-Host $line.PadRight($width)
-            }
-            $key = [Console]::ReadKey($true)
-            switch ($key.Key) {
-                'UpArrow' { $cursor = [Math]::Max(0, $cursor - 1) }
-                'DownArrow' { $cursor = [Math]::Min($Items.Count - 1, $cursor + 1) }
-                'Spacebar' { $selected[$cursor] = -not $selected[$cursor] }
-                'A' { $all = @($selected | Where-Object { -not $_ }).Count -gt 0; for ($i = 0; $i -lt $selected.Count; $i++) { $selected[$i] = $all } }
-                'Escape' { throw [OperationCanceledException]::new('Cancelled; no further changes will be applied.') }
-                'Enter' { return @($Items | Where-Object { $selected[[array]::IndexOf($Items, $_)] } | ForEach-Object Id) }
-            }
-        }
-    }
     for ($i = 0; $i -lt $Items.Count; $i++) {
         $mark = if ($selected[$i]) { 'x' } else { ' ' }
         Write-Host ("{0,2}. [{1}] {2}" -f ($i + 1), $mark, $Items[$i].Label)
@@ -54,26 +23,41 @@ function Read-DotfilesSelection([object[]]$Items, [string]$Title) {
     }
 }
 
-function Install-DotfilesDependencies($Context, [string[]]$Ids) {
+function Install-DotfilesDependencies {
+    param($Context, [string[]]$Ids, [switch]$NonInteractive, [switch]$PassThru)
+    $results = New-Object 'System.Collections.Generic.List[object]'
     $winget = Get-Command winget -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     foreach ($id in $Ids) {
         if ($id -eq 'vscode-extensions') {
             $code = Get-DotfilesCommand $Context 'vscode'
-            if (-not $code) { Write-Warning 'Install VS Code first, then rerun for extensions.'; continue }
+            if (-not $code) {
+                Write-Warning 'Install VS Code first, then rerun for extensions.'
+                $results.Add([pscustomobject]@{ Id = $id; Success = $false; Message = 'Install VS Code first, then rerun for extensions.' }); continue
+            }
+            $success = $true
             foreach ($extension in Get-Content -LiteralPath (Join-Path $Context.Root 'config/vscode/common/extensions.txt')) {
                 if ($extension.Trim()) {
                     & $code --install-extension $extension.Trim()
-                    if ($LASTEXITCODE -ne 0) { Write-Warning "Could not install extension $extension" }
+                    if ($LASTEXITCODE -ne 0) { $success = $false; Write-Warning "Could not install extension $extension" }
                 }
             }
+            $results.Add([pscustomobject]@{ Id = $id; Success = $success; Message = $(if ($success) { 'Extensions installed.' } else { 'Some extensions need manual installation.' }) })
             continue
         }
         $package = $Context.Packages | Where-Object id -eq $id | Select-Object -First 1
-        if (-not $winget -or -not $package -or $package.winget -eq '-') { Write-Host "MANUAL: $id - see docs/tools/windows-dependencies.md" -ForegroundColor Yellow; continue }
+        if (-not $winget -or -not $package -or $package.winget -eq '-') {
+            Write-Host "MANUAL: $id - see docs/tools/windows-dependencies.md" -ForegroundColor Yellow
+            $results.Add([pscustomobject]@{ Id = $id; Success = $false; Message = 'Install through your company portal or approved package manager.' }); continue
+        }
         Write-Host "Installing $id with WinGet (user scope)..."
-        & $winget.Source install --id $package.winget --exact --source winget --scope user
-        if ($LASTEXITCODE -ne 0) { Write-Warning "$id could not be installed in user scope. Install through your company portal or package manager." }
+        $arguments = @('install', '--id', $package.winget, '--exact', '--source', 'winget', '--scope', 'user')
+        if ($NonInteractive) { $arguments += '--disable-interactivity' }
+        & $winget.Source @arguments
+        $success = $LASTEXITCODE -eq 0
+        if (-not $success) { Write-Warning "$id could not be installed in user scope. Install through your company portal or package manager." }
+        $results.Add([pscustomobject]@{ Id = $id; Success = $success; Message = $(if ($success) { 'Package command completed; version will be checked again.' } else { 'Manual installation required. Any package agreements must be handled in your normal installer.' }) })
     }
     # Refresh PATH for applications installed during this wizard.
     if ($Ids.Count) { $env:PATH = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User') }
+    if ($PassThru) { $results.ToArray() }
 }

@@ -22,6 +22,7 @@ powershell	windows	directory	config/powershell/windows/Modules/Dev.Git	{PSMODULE
 powershell	windows	directory	config/powershell/windows/Modules/Dev.Docker	{PSMODULES}/Dev.Docker
 powershell	windows	directory	config/powershell/windows/Modules/Dev.Projects	{PSMODULES}/Dev.Projects
 wezterm	windows	directory	config/wezterm/windows	{WEZTERM}
+wezterm	windows	absent	-	{HOME}/.wezterm.lua
 windows-terminal	windows	file	config/windows-terminal/windows/settings.json	{TERMINAL}/settings.json
 glazewm	windows	file	config/glazewm/windows/config.yaml	{GLAZEWM}
 zebar	windows	directory	config/zebar/windows	{HOME}/.glzr/zebar

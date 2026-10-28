@@ -1,12 +1,14 @@
 . (Join-Path $PSScriptRoot 'Catalog.ps1')
 . (Join-Path $PSScriptRoot 'Transaction.ps1')
 . (Join-Path $PSScriptRoot 'Interface.ps1')
+. (Join-Path $PSScriptRoot 'Apply.ps1')
+. (Join-Path $PSScriptRoot 'Workbench.ps1')
 
 function Invoke-DotfilesInstaller {
     [CmdletBinding()]
     param(
         [string]$Root, [string[]]$Only, [bool]$Yes, [bool]$SkipDependencies,
-        [bool]$SkipMissing, [bool]$DryRun, [string]$HomeDirectory,
+        [bool]$SkipMissing, [bool]$DryRun, [bool]$Plain, [string]$HomeDirectory,
         [string]$WezTermDirectory, [string]$VSCodeDirectory, [string]$TerminalDirectory, [string]$Restore
     )
     if ([Environment]::OSVersion.Platform -ne 'Win32NT') { throw 'Use install.sh on macOS and Linux.' }
@@ -29,6 +31,18 @@ function Invoke-DotfilesInstaller {
             Restore-DotfilesRun $context $Restore $DryRun
             return
         }
+        if (-not $Yes -and -not $Plain -and (Test-DotfilesWorkbenchAvailable)) {
+            $outcome = Invoke-DotfilesWorkbench -Context $context -Tools $tools -SkipDependencies $SkipDependencies -SkipMissing $SkipMissing -DryRun $DryRun
+            if ($outcome.Cancelled) { Write-Host 'Setup cancelled. No pending changes were applied.'; return }
+            if ($outcome.Preview) { Write-Host 'Preview complete. No software, configurations or backups changed.'; return }
+            foreach ($result in @($outcome.Results) + @($outcome.PackageResults)) {
+                if ($result.Success) { Write-Host "INSTALLED: $($result.Id)" -ForegroundColor Green }
+                else { Write-Warning "FAILED: $($result.Id). $($result.Message)" }
+            }
+            if ($outcome.Run) { Write-Host "Backup run: $($outcome.Run.Directory)" }
+            if (@($outcome.Results + $outcome.PackageResults | Where-Object { -not $_.Success }).Count) { throw 'Setup finished with failures; see the results above.' }
+            return
+        }
         Write-Host "`nDotfiles - Windows" -ForegroundColor Cyan
         Write-Host '1/4 - Tools and dependencies'
         $statuses = @{}
@@ -46,6 +60,7 @@ function Invoke-DotfilesInstaller {
         }
         Write-Host "`n2/4 - Missing dependencies" -ForegroundColor Cyan
         $missing = @($statuses.Keys | Where-Object { -not $statuses[$_].Ready } | Sort-Object)
+        $chosenPackages = @()
         if ($missing.Count -and -not $SkipDependencies -and -not $Yes -and -not $DryRun) {
             Write-Host '1. Install selected missing dependencies'
             Write-Host '2. I will handle dependencies myself (default)'
@@ -54,10 +69,8 @@ function Invoke-DotfilesInstaller {
             if ($choice -eq '1') {
                 $requiredIds = @($tools.id) + @($tools | ForEach-Object { $_.required -split ',' })
                 $items = @($missing | ForEach-Object { [pscustomobject]@{ Id = $_; Label = $_; Default = ($_ -in $requiredIds) } })
-                $chosen = @(Read-DotfilesSelection $items 'Select software to install')
-                Install-DotfilesDependencies $context $chosen
-                foreach ($id in @($statuses.Keys)) { $statuses[$id] = Get-DotfilesStatus $context $id }
-                foreach ($id in $chosen) { Write-DotfilesStatus $statuses[$id] $id }
+                $chosenPackages = @(Read-DotfilesSelection $items 'Select software to install after review')
+                Write-Host 'Selected software is queued. Nothing will be installed before the final confirmation.'
             } elseif ($choice -eq '3') { $SkipMissing = $true }
             elseif ($choice -notin @('', '2')) { throw 'Cancelled: choose a displayed dependency option.' }
         } elseif ($missing.Count) { Write-Host ('No software will be installed. Missing: ' + ($missing -join ', ')) }
@@ -83,29 +96,15 @@ function Invoke-DotfilesInstaller {
         }
         if ($DryRun) { Write-Host "`nPreview only: no packages, configurations or backups changed."; return }
         $selected = if ($Yes) { @($items | ForEach-Object Id) } else { @(Read-DotfilesSelection $items 'Select configurations to install or replace') }
-        if ($selected.Count -eq 0) { Write-Host 'Nothing selected.'; return }
+        if ($selected.Count -eq 0 -and $chosenPackages.Count -eq 0) { Write-Host 'Nothing selected.'; return }
         Write-Host "`n4/4 - Review" -ForegroundColor Cyan
         Write-Host ('Install/replace: ' + ($selected -join ', '))
+        if ($chosenPackages.Count) { Write-Host ('Software to install: ' + ($chosenPackages -join ', ')) }
         Write-Host "Existing targets will be moved into a timestamped backup under $($context.State)/backups."
         if (-not $Yes -and (Read-Host 'Apply these changes? Type yes') -ne 'yes') { Write-Host 'Cancelled.'; return }
-        New-Item -ItemType Directory -Path $context.State -Force | Out-Null
-        $lock = [IO.File]::Open((Join-Path $context.State 'installer.lock'), 'OpenOrCreate', 'ReadWrite', 'None')
-        $run = New-DotfilesRun $context
-        $failures = @()
-        foreach ($id in $selected) {
-            try {
-                Install-DotfilesTool $context $run $id
-                Write-Host "INSTALLED: $id" -ForegroundColor Green
-                if ($id -eq 'wezterm' -and -not $context.Staging) {
-                    $pwsh = Get-DotfilesCommand $context 'pwsh'
-                    if ($pwsh) {
-                        try { & $pwsh -NoProfile -File (Join-Path $context.Variables.WEZTERM 'scripts/Refresh-Projects.ps1') | Out-Null }
-                        catch { Write-Warning 'WezTerm will refresh its project index when it starts.' }
-                    }
-                }
-            } catch { $failures += $id; Write-Warning "FAILED: $id. $($_.Exception.Message)" }
-        }
-        Write-Host "`nBackup run: $($run.Directory)"
+        $outcome = Invoke-DotfilesApply -Context $context -Selected $selected -Packages $chosenPackages
+        $failures = @($outcome.Results + $outcome.PackageResults | Where-Object { -not $_.Success } | ForEach-Object Id)
+        if ($outcome.Run) { Write-Host "`nBackup run: $($outcome.Run.Directory)" }
         Write-Host ('Skipped: ' + (@($tools.id | Where-Object { $_ -notin $selected }) -join ', '))
         Write-Host 'Reopen the affected applications. See docs/configuration.md for first-launch steps and restore commands.'
         if ($failures.Count) { throw ('Installation finished with failures: ' + ($failures -join ', ')) }
