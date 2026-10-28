@@ -9,3 +9,4 @@ nvim/lazy-lock.json
 .config/.oh-my-zsh/
 .secrets
 .dotfiles-sync/
+windows_stuff/wezterm/local.lua

@@ -1,0 +1,8 @@
+- WezTerm for Windows, portable ZIP or installed version: 20240203-110809-5046fc22 or newer.
+- PowerShell 7.2 or newer: `pwsh.exe` on PATH, or set its full path in WezTerm's `local.lua`.
+- Git for Windows 2.31 or newer: `git.exe` on PATH.
+- Neovim 0.12 or newer for this repository's editor configuration: `nvim.exe` on PATH.
+- GitHub Copilot CLI: `copilot.exe` on PATH, authenticated with your work account.
+- JetBrains Mono Nerd Font: already installed; default family is `JetBrainsMonoNL Nerd Font Mono`.
+- ripgrep: `rg.exe` on PATH for Neovim's file/content searches.
+- Windows 10 or 11 with transparency effects enabled for acrylic; fully opaque mode works without them.

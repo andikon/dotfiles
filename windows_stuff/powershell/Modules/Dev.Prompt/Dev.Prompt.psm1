@@ -1,5 +1,11 @@
 function prompt {
 
+    # Let WezTerm inherit the real shell directory for new tabs and splits.
+    if ($env:WEZTERM_PANE -and $PWD.Provider.Name -eq 'FileSystem') {
+        $directoryUri = [Uri]::new($PWD.ProviderPath)
+        [Console]::Write("$([char]27)]7;$($directoryUri.AbsoluteUri)$([char]27)\")
+    }
+
     function Write-Colored($text, $color) {
         Write-Host $text -NoNewline -ForegroundColor $color
     }

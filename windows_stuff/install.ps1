@@ -1,5 +1,13 @@
 #Requires -Version 7
-# Installs the nvim config, the PowerShell profile/modules and merges the Windows Terminal settings.
+# Installs dotfiles only. Install the programs in deps.md manually.
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [ValidateSet('All', 'WezTerm', 'PowerShell', 'Neovim', 'WindowsTerminal')]
+    [string]$Only = 'All',
+    # For portable mode, point to the extracted folder containing wezterm.exe.
+    [string]$WezTermDirectory
+)
+
 $ErrorActionPreference = 'Stop'
 
 $dotfiles = Split-Path $PSScriptRoot -Parent
@@ -66,6 +74,42 @@ function Install-WindowsTerminal {
     }
 }
 
-Install-Nvim
-Install-PowerShell
-Install-WindowsTerminal
+function Get-WezTermDestination {
+    if ($WezTermDirectory) {
+        $destination = [IO.Path]::GetFullPath($WezTermDirectory)
+        if (-not (Test-Path -LiteralPath (Join-Path $destination 'wezterm.exe') -PathType Leaf)) {
+            throw 'WezTermDirectory must be the extracted portable folder containing wezterm.exe.'
+        }
+        return $destination
+    }
+    $configRoot = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { Join-Path $env:USERPROFILE '.config' }
+    return Join-Path $configRoot 'wezterm'
+}
+
+function Install-WezTerm([string]$Destination) {
+    $source = Join-Path $PSScriptRoot 'wezterm'
+    foreach ($file in (Get-ChildItem -LiteralPath $source -Recurse -File)) {
+        if ($file.Name -eq 'local.lua') { continue }
+        $relative = [IO.Path]::GetRelativePath($source, $file.FullName)
+        $target = Join-Path $Destination $relative
+        New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null
+        if (Test-Path -LiteralPath $target -PathType Leaf) { Copy-Item -LiteralPath $target -Destination "$target.bak" -Force }
+        Copy-Item -LiteralPath $file.FullName -Destination $target -Force
+    }
+    Write-Host "Installed WezTerm config -> $Destination (local.lua preserved)"
+    Write-Host 'Open WezTerm, then press Ctrl+a followed by f to choose a project.'
+}
+
+if ($Only -in 'All', 'Neovim') {
+    if ($PSCmdlet.ShouldProcess((Join-Path $env:LOCALAPPDATA 'nvim'), 'Install Neovim configuration')) { Install-Nvim }
+}
+if ($Only -in 'All', 'PowerShell') {
+    if ($PSCmdlet.ShouldProcess([Environment]::GetFolderPath('MyDocuments'), 'Install PowerShell profile and modules')) { Install-PowerShell }
+}
+if ($Only -in 'All', 'WindowsTerminal') {
+    if ($PSCmdlet.ShouldProcess('Windows Terminal settings', 'Merge actions and color schemes')) { Install-WindowsTerminal }
+}
+if ($Only -in 'All', 'WezTerm') {
+    $wezTermDestination = Get-WezTermDestination
+    if ($PSCmdlet.ShouldProcess($wezTermDestination, 'Install WezTerm configuration and project picker')) { Install-WezTerm $wezTermDestination }
+}

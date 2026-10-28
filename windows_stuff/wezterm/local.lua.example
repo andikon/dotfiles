@@ -1,0 +1,11 @@
+-- Copy to local.lua beside wezterm.lua. The installer preserves local.lua.
+return {
+  -- project_roots = { 'C:/Users/your-name/Code', 'D:/Work' },
+  -- shell = 'C:/Tools/PowerShell/pwsh.exe',
+  -- editor = 'nvim.exe',
+  -- agent = 'copilot.exe',
+  -- font = 'JetBrainsMonoNL Nerd Font Mono',
+  -- font_size = 12.0,
+  -- opacity = 0.94, -- 1.0 is fully opaque; acrylic needs a value below 1.0.
+  -- max_depth = 4, -- grouping folders below each project root
+}
