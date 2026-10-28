@@ -15,10 +15,11 @@ return {
         opts = {
             line = function(line)
                 return {
-                    { "  WORKSPACE  ", hl = "TabLineFill" },
+                    { "  VIEWS  ", hl = "TabLineFill" },
                     line.tabs().foreach(function(tab)
-                        local root = vim.fn.getcwd(-1, tab.number())
-                        local name = vim.t[tab.id].workspace_name or vim.fs.basename(root)
+                        local win = vim.api.nvim_tabpage_get_win(tab.id)
+                        local path = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+                        local name = vim.t[tab.id].tab_name or (path ~= "" and vim.fs.basename(path) or "[Untitled]")
                         return { " " .. tab.number() .. " ", name, " ",
                             hl = tab.is_current() and "TabLineSel" or "TabLine", margin = " " }
                     end),
@@ -76,9 +77,9 @@ return {
                 { "<leader>b", group = "Buffers" }, { "<leader>c", group = "Code" },
                 { "<leader>d", group = "Debug" }, { "<leader>f", group = "Files" },
                 { "<leader>g", group = "Git" }, { "<leader>j", group = "Java / IntelliJ" },
-                { "<leader>p", group = "Projects" }, { "<leader>r", group = "Run" },
+                { "<leader>r", group = "Run" },
                 { "<leader>s", group = "Search" }, { "<leader>t", group = "Terminals" },
-                { "<leader>u", group = "UI" }, { "<leader>w", group = "Worktrees" },
+                { "<leader>u", group = "UI" },
                 { "<leader><tab>", group = "Tabs / views" },
             },
         },

@@ -17,26 +17,26 @@ IntelliJ's Neovim client is pre-alpha. Its server still imports/indexes Java pro
 
 ## Working on a change
 
-1. **Space pp** opens or returns to a project. **Space pd** opens an arbitrary directory. Each project uses a separate tab and tab-local working directory.
+1. Open your checkout or worktree in the terminal, then launch `nvim` there. On Windows, use [WezTerm's project picker](wezterm.md#projects-and-worktrees) to open or return to a workspace and [`gwt`](powershell.md#git-worktrees) to create worktrees. Neovim inherits that directory; **Space ff** finds files and **Space fg** searches its contents.
 2. Outline the important interfaces/tests manually; **Space cs** opens document symbols and **Space ao** asks Copilot for a plan.
-3. For independent agent work, **Space wn** creates a branch/worktree and opens it as a project; **Space an** starts an agent there. The agent terminal keeps that directory even after you switch projects.
-4. **Esc Esc** leaves terminal input mode; **Space ah** hides the agent window. **Space al** lists agent/build terminals across projects and shows whether their processes are running, exited or failed. A running CLI may be waiting for an approval or prompt.
+3. Use the terminal workspace's agent pane for independent work. **Space an** remains available when you want an agent terminal inside the editor; it keeps the directory where it started.
+4. **Esc Esc** leaves terminal input mode; **Space ah** hides the agent window. **Space al** lists agent/build terminals in this editor and shows whether their processes are running, exited or failed. A running CLI may be waiting for an approval or prompt.
 5. Review with **Space gc** (CodeDiff), run tests with **Space rt**, then make any semantic refactorings with **Space cr** / **Space ca**.
 
-**Background jobs survive project and tab changes only while Neovim remains open. Quitting Neovim ends them.** Use a separate persistent terminal/session manager for jobs that must outlive the editor. Hiding a job is different from stopping it; **Space as** explicitly asks which job to stop.
+**Editor-hosted jobs survive view changes only while Neovim remains open. Quitting Neovim ends them.** Use the terminal workspace for jobs that should run independently of the editor. Hiding a job is different from stopping it; **Space as** explicitly asks which editor job to stop.
 
-Open projects retain live buffers, unsaved changes, split layouts and language servers. This trades memory for fast return visits. IntelliJ can use substantial memory per project; avoid opening many large Java projects at once. Layout snapshots store file paths, splits and cursors in Neovim's data directory; **Space Tab x** saves before closing, and **Space ps** saves explicitly. Jobs and unsaved file contents are never serialized. Existing `.vim` project-session files are retained but the new file-only JSON snapshots start fresh.
+Neovim handles editing and IDE features within the inherited checkout. It does not discover, create or switch projects/worktrees, or save/restore project sessions. Tabs are ordinary editor views: **Space Tab n** opens a view, **Space Tab r** names it, and **Space Tab x** closes it. Buffers remain available across views; closing a view does not create a layout snapshot. Old project/session history in your Neovim data directory is left untouched and is no longer loaded.
 
-Copilot Chat uses the active file as sticky context. Visual selections also work with the AI shortcuts. `#file:path` and `#gitdiff:staged` add explicit context; `#buffer:listed` can span projects. Use `:CopilotChatSave NAME` / `:CopilotChatLoad NAME` for named conversations, and **Space aR** to reset before changing topics/projects. Chat and CLI agents are separate sessions. Normal chat requests wait for you to send a prompt; project switching never submits one automatically.
+Copilot Chat uses the active file as sticky context. Visual selections also work with the AI shortcuts. `#file:path` and `#gitdiff:staged` add explicit context; `#buffer:listed` includes listed editor buffers. Use `:CopilotChatSave NAME` / `:CopilotChatLoad NAME` for named conversations, and **Space aR** to reset before changing topics. Chat and CLI agents are separate sessions. Normal chat requests wait for you to send a prompt.
 
 ## Editor layout
 
-The default theme is the Neovim port of Doom Emacs' **Doom One**: charcoal backgrounds, muted chrome, blue keywords, green strings and warm purple/yellow accents. The Berserk dashboard uses a crimson, terminal-native Brand of Sacrifice-inspired emblem and project/agent shortcuts. It adapts to shorter windows and has no animation timer or image dependencies.
+The default theme is the Neovim port of Doom Emacs' **Doom One**: charcoal backgrounds, muted chrome, blue keywords, green strings and warm purple/yellow accents. The Berserk dashboard uses a crimson, terminal-native Brand of Sacrifice-inspired emblem and file/search/chat shortcuts. It adapts to shorter windows and has no animation timer or image dependencies.
 
 | Component | Role |
 | --- | --- |
-| Tabby | Project and view tabs, renamed with Space Tab r |
-| Lualine | Mode, project, Git branch/diff, path, diagnostics, LSP progress and running job count |
+| Tabby | Editor views labeled by filename, renamed with Space Tab r |
+| Lualine | Mode, working directory, Git branch/diff, path, diagnostics, LSP progress and editor job count |
 | Incline | Compact file labels on splits, modified/read-only state |
 | Heirline | Native diagnostic signs, line numbers and fold column |
 | hlchunk | Current brace scope and scope line numbers; no parser required |

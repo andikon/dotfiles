@@ -9,7 +9,6 @@ return {
       width = 52,
       preset = {
         keys = {
-          { icon = " ", key = "p", desc = "Projects", action = function() require("projects").pick() end },
           { icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
           { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
           { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.dashboard.pick('live_grep')" },
@@ -23,7 +22,6 @@ return {
       sections = {
         function() return require("dashboard").header() end,
         { section = "keys", gap = 0, padding = 1 },
-        function() return require("dashboard").projects() end,
         { section = "startup" },
       },
     },
@@ -62,7 +60,6 @@ return {
     { "<leader>e", function() Snacks.explorer() end, desc = "File Explorer" },
 
     -- git
-    { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
     { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
     { "<leader>gL", function() Snacks.picker.git_log_line() end, desc = "Git Log Line" },
     { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },

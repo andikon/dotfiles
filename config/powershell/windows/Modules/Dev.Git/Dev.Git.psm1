@@ -1,3 +1,17 @@
+function gwt {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Position = 0)][string]$Branch,
+        [string]$Base,
+        [string]$Existing,
+        [string]$Path,
+        [switch]$Fetch,
+        [switch]$Enter
+    )
+    # Keep the script usable independently of this module and the interactive profile.
+    & (Join-Path $PSScriptRoot 'New-GitWorktree.ps1') @PSBoundParameters
+}
+
 function gs { git status }
 function ga { git add . }
 function gp { git push }
@@ -55,7 +69,7 @@ function gclean {
 	$branches | ForEach-Object { Write-Host "  $_" }
 
 	if ($WhatIf) {
-		Write-Host "`n(WhatIf mode — nothing deleted)"
+		Write-Host "`n(WhatIf mode - nothing deleted)"
 		return
 	}
 

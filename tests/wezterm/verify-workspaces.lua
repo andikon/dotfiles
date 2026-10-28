@@ -18,8 +18,10 @@ local fake = {
   on = function() end,
   time = { call_after = function(_, callback) timers[#timers + 1] = callback end },
 }
-fake.action = setmetatable({}, { __index = function(_, name)
-  return function(value) return { kind = name, value = value } end
+fake.action = setmetatable({}, { __index = function(actions, name)
+  local constructor = function(value) return { kind = name, value = value } end
+  rawset(actions, name, constructor)
+  return constructor
 end })
 local function new_pane(args)
   return {
@@ -41,7 +43,7 @@ fake.mux.spawn_window = function(spec)
   live[spec.workspace] = true
   local editor = new_pane(spec.args)
   spec.editor = editor
-  return { set_title = function() end }, editor, {}
+  return { set_title = function(_, title) spec.title = title end }, editor, {}
 end
 local a = { workspace = 'project:a', path = "C:/Code/team's worktree Ü & one", repository = 'shared', branch = 'main' }
 local b = { workspace = 'project:b', path = 'D:/Other/shared', repository = 'shared', branch = 'feature' }
@@ -77,13 +79,19 @@ end
 
 projects.pick(window, original, false, false)
 assert(scans == 0, 'The picker must open before a worker is started')
-assert(#selected.choices == 3, 'Disk projects and live default workspace must share one picker')
+assert(#selected.choices == 3 and selected.choices[1].id == b.workspace and selected.choices[2].id == a.workspace, 'All projects must include sorted checkouts and a view switch, excluding the home shell')
+assert(selected.choices[3].id == '__view__' and selected.title == 'Projects — All projects', 'All projects must offer the active view')
+selected.action(window, original, '__view__')
+assert(selected.title == 'Projects — Active projects' and selected.choices[1].id == '__empty__', 'An empty active view must stay usable without listing unopened projects or the home shell')
+assert(scans == 0, 'Switching views must not block on discovery')
+selected.action(window, original, '__view__')
 selected.action(window, original, nil)
 assert(#spawned == 0 and current == 'default', 'Cancel must leave the running application unchanged')
 selected.action(window, original, a.workspace)
 assert(#spawned == 1 and #splits == 2, 'First visit must create one three-pane workspace')
 assert(spawned[1].cwd == a.path and splits[1].cwd == a.path and splits[2].cwd == a.path, 'Every pane must start in the exact selected path')
 assert(spawned[1].editor.activated, 'Focus must return to the editor')
+assert(spawned[1].title ~= projects.label(a.workspace), 'The tab must not repeat the project label already shown in the header')
 assert(splits[1].args[#splits[1].args] == 'copilot.exe', 'Agent pane must launch the configured CLI')
 spawned[1].editor.unsaved_work = 'keep this state'
 projects.open(window, original, b)
@@ -100,6 +108,11 @@ assert(selected.choices[1].id == a.workspace, 'Current workspace should sort fir
 local before = scans
 projects.pick(window, original, false, true)
 assert(scans == before and #selected.choices == 3, 'Running-only picker must use live state without scanning')
+assert(selected.choices[1].id == a.workspace and selected.choices[2].id == b.workspace, 'Active projects must include all open checkouts')
+live[b.workspace] = nil
+projects.pick(window, original, false, true)
+assert(#selected.choices == 2 and selected.choices[1].id == a.workspace, 'Closed checkouts must disappear from the active view immediately')
+live[b.workspace] = true
 projects.pick(window, original, true, false)
 flush_timers()
 assert(scans == before + 1, 'Refresh must bypass the disk cache')
@@ -125,6 +138,107 @@ fake.GLOBAL = {}
 projects.setup(options)
 projects.pick(window, original, false, false)
 assert(#selected.choices == 3 and #timers == 0, 'Persisted projects must be available immediately after reload')
+-- Model native Multiple dispatch: actions complete before GUI reconciliation.
+local windows, closed, dispatches = {}, {}, 0
+local function fixture_window(id, workspace, count)
+  local tabs, active = {}, 1
+  for i = 1, count do tabs[i] = workspace .. ':' .. id .. ':' .. i end
+  local gui = {
+    window_id = function() return id end,
+    active_workspace = function() return current end,
+    toast_notification = window.toast_notification,
+    perform_action = function(_, action)
+      if action.kind == 'InputSelector' then selected = action.value; return end
+      assert(action.kind == 'Multiple', 'Close must use one native batch per window')
+      dispatches = dispatches + 1
+      for _, item in ipairs(action.value) do
+        if item.kind == 'ActivateTab' then active = item.value + 1
+        elseif item.kind == 'CloseCurrentTab' then
+          assert(item.value.confirm == false, 'Confirmation must not repeat per tab or pane')
+          closed[#closed + 1] = table.remove(tabs, active)
+        elseif item.kind == 'SwitchToWorkspace' then current = item.value.name
+        else error('Unexpected close action: ' .. item.kind) end
+      end
+    end,
+  }
+  local mux = {
+    get_workspace = function() return workspace end,
+    window_id = function() return id end,
+    tabs = function() return tabs end,
+    gui_window = function() return gui end,
+  }
+  windows[#windows + 1] = mux
+  return gui, mux
+end
+fake.mux.all_windows = function() return windows end
+current = a.workspace
+local caller = fixture_window(12, a.workspace, 2)
+fixture_window(13, a.workspace, 1)
+local _, other = fixture_window(14, b.workspace, 2)
+projects.close(caller, original)
+assert(selected.choices[1].id == 'cancel', 'The safe choice must be selected by default')
+selected.action(caller, original, nil)
+selected.action(caller, original, 'cancel')
+assert(#closed == 0 and current == a.workspace, 'Cancel must preserve all tabs and focus')
+selected.action(caller, original, 'close')
+assert(#closed == 3 and dispatches == 2, 'Close must include all tabs in all project windows')
+assert(#other:tabs() == 2 and current == b.workspace, 'Another project must stay untouched and become active')
+windows, closed, dispatches = {}, {}, 0
+current = a.workspace
+caller = fixture_window(15, a.workspace, 3)
+local spawn_before = #spawned
+projects.close(caller, original)
+selected.action(caller, original, 'close')
+assert(#closed == 3 and #spawned == spawn_before + 1 and current == 'default', 'Closing the last project must leave a fresh home shell')
+assert(spawned[#spawned].cwd == fake.home_dir and spawned[#spawned].args[1] == options.shell, 'The home shell must use the configured shell')
+windows, closed = {}, {}
+current = a.workspace
+caller = fixture_window(16, a.workspace, 1)
+projects.close(caller, original)
+current = b.workspace
+selected.action(caller, original, 'close')
+assert(#closed == 0, 'An outdated confirmation must not close a different active project')
+
+local events = {}
+fake.on = function(name, callback) events[name] = callback end
+fake.config_builder = function() return {} end
+fake.font_with_fallback = function(fonts) return fonts end
+fake.add_to_config_reload_watch_list = function() end
+fake.mux.get_window = function() return { get_workspace = function() return a.workspace end } end
+package.loaded.projects = projects
+local config = dofile(root .. '/wezterm.lua')
+assert(config.enable_tab_bar and not config.hide_tab_bar_if_only_one_tab, 'The header must always be shown')
+local quit_bound, close_bound = false, false
+local help_action
+for _, key in ipairs(config.keys) do
+  assert(not (key.key == 'b' and key.mods == 'LEADER'), 'The header toggle must not remain bound')
+  if key.key == 'Q' and key.mods == 'LEADER|SHIFT' then quit_bound = key.action == fake.action.QuitApplication end
+  if key.key == 'X' and key.mods == 'LEADER|SHIFT' then close_bound = type(key.action) == 'function' end
+  if key.key == '?' then help_action = key.action end
+end
+assert(quit_bound and close_bound, 'Project close and native application quit must be bound')
+assert(type(help_action) == 'function', 'Ctrl+a ? must open help')
+local help_window = { perform_action = function(_, action) selected = action.value end }
+help_action(help_window, original)
+assert(selected.fuzzy and selected.title:find('Ctrl+a', 1, true), 'Shortcut help must be searchable and explain the prefix')
+local help_rows = selected.choices
+local found_quit, found_resize = false, false
+for _, row in ipairs(help_rows) do
+  if row.label:find('Quit WezTerm', 1, true) then found_quit = row.label:find('Shift+q', 1, true) ~= nil end
+  if row.label:find('Resize left', 1, true) then found_resize = true end
+end
+assert(found_quit and found_resize, 'Help must reflect registry bindings and resize mode')
+local before_help = #closed
+selected.action(help_window, original, nil)
+selected.action(help_window, original, '25')
+assert(#closed == before_help, 'Help must never dispatch destructive actions')
+local tab = { tab_title = projects.label(a.workspace), tab_index = 0, window_id = 12, active_pane = { title = 'pwsh' } }
+assert(events['format-tab-title'](tab) == ' 1  Project ', 'Existing tabs must stop repeating the header after reload')
+tab.tab_title = 'My notes'
+assert(events['format-tab-title'](tab) == ' 1  My notes ', 'Custom tab names must be preserved')
+tab.tab_title = ''
+assert(events['format-tab-title'](tab) == ' 1  pwsh ', 'Shell tabs must use the active process title')
+assert(config.window_close_confirmation == 'AlwaysPrompt', 'Native quit must retain its application-wide confirmation')
 os.remove(cache_file)
 vim.fn.delete(options.cache_dir, 'd')
-print('PASS: workspace reuse, process preservation, cancellation, background index and cwd inheritance.')
+print('PASS: workspace reuse, process preservation, cancellation, background index, cwd inheritance, headers and project closure.')

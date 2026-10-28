@@ -1,0 +1,40 @@
+group	scope	key	mods	action	description
+Projects	key	f	LEADER	projects_all	All projects
+Projects	key	F	LEADER|SHIFT	projects_refresh	Refresh discovery and show all projects
+Projects	key	w	LEADER	projects_active	Active projects
+Projects	key	X	LEADER|SHIFT	project_close	Close project and all its tabs (confirm once)
+Panes	key	h	LEADER	pane_left	Focus left pane
+Panes	key	j	LEADER	pane_down	Focus pane below
+Panes	key	k	LEADER	pane_up	Focus pane above
+Panes	key	l	LEADER	pane_right	Focus right pane
+Panes	key	v	LEADER	split_right	Split right
+Panes	key	s	LEADER	split_below	Split below
+Panes	key	a	LEADER	pane_select	Select a numbered pane
+Panes	key	S	LEADER|SHIFT	pane_swap	Swap with a numbered pane
+Panes	key	z	LEADER	pane_zoom	Focus/unfocus current pane
+Panes	key	t	LEADER	pane_zoom	Focus/unfocus current pane
+Panes	key	x	LEADER	pane_close	Close pane with confirmation
+Panes	key	r	LEADER	resize_mode	Enter resize mode
+Tabs	key	c	LEADER	tab_new	New shell tab
+Tabs	key	n	LEADER	tab_next	Next tab
+Tabs	key	p	LEADER	tab_previous	Previous tab
+Tabs	key	1..9	LEADER	tab_number	Select tab 1 through 9
+Tabs	key	H	LEADER|SHIFT	tab_left	Move tab left
+Tabs	key	L	LEADER|SHIFT	tab_right	Move tab right
+Tabs	key	,	LEADER	tab_rename	Rename tab
+Actions	key	?	LEADER|SHIFT	help	Show shortcut help
+Actions	key	Q	LEADER|SHIFT	quit	Quit WezTerm and all projects (confirm once)
+Actions	key	R	LEADER|SHIFT	reload	Reload configuration
+Actions	key	[	LEADER	copy	Keyboard copy and scrollback mode
+Actions	key	a	LEADER|CTRL	literal_prefix	Send literal Ctrl+a
+Appearance	key	o	LEADER	opacity	Toggle acrylic/opaque background
+Appearance	key	m	LEADER	maximize	Maximize window
+Global	key	F11	NONE	fullscreen	Toggle fullscreen
+Global	key	P	CTRL|SHIFT	palette	Open command palette
+Global	mouse	Left drag	CTRL|SHIFT	drag	Move borderless window
+Resize mode	resize	h	NONE	resize_left	Resize left (3 cells)
+Resize mode	resize	j	NONE	resize_down	Resize down (3 cells)
+Resize mode	resize	k	NONE	resize_up	Resize up (3 cells)
+Resize mode	resize	l	NONE	resize_right	Resize right (3 cells)
+Resize mode	resize	Enter	NONE	resize_exit	Finish resizing
+Resize mode	resize	Escape	NONE	resize_exit	Finish resizing

@@ -54,3 +54,18 @@ jobs:
       - name: Test workspace discovery and portable configuration
         shell: pwsh
         run: .\tests\wezterm\Verify-WezTerm.ps1
+      - name: Check shortcut registry and generated documentation
+        run: python tests/wezterm/verify-shortcuts.py
+      - name: Check editor workflow when Neovim is available
+        shell: pwsh
+        run: |
+          if (Get-Command nvim -ErrorAction SilentlyContinue) {
+            nvim --headless -u NONE -l tests/nvim/verify-editor.lua
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else { Write-Warning 'Neovim is unavailable; editor runtime checks skipped.' }
+      - name: Test Git worktrees in Windows PowerShell 5.1
+        shell: powershell
+        run: .\tests\powershell\Test-GitWorktree.ps1
+      - name: Test Git worktrees in PowerShell 7
+        shell: pwsh
+        run: .\tests\powershell\Test-GitWorktree.ps1

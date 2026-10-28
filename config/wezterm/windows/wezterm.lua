@@ -41,7 +41,7 @@ config.text_background_opacity = 1.0
 config.window_padding = { left = 14, right = 14, top = 12, bottom = 10 }
 config.initial_cols = 150
 config.initial_rows = 42
-config.enable_tab_bar = false
+config.enable_tab_bar = true
 config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = false
 config.show_new_tab_button_in_tab_bar = false
@@ -86,69 +86,63 @@ local function toggle_opaque(window)
   end
   window:set_config_overrides(overrides)
 end
-local function toggle_tabs(window)
-  local overrides = window:get_config_overrides() or {}
-  overrides.enable_tab_bar = not window:effective_config().enable_tab_bar
-  window:set_config_overrides(overrides)
-end
 
 config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1500 }
-config.keys = {
-  { key = 'a', mods = 'LEADER|CTRL', action = act.SendKey { key = 'a', mods = 'CTRL' } },
-  { key = 'f', mods = 'LEADER', action = picker(false, false) },
-  { key = 'F', mods = 'LEADER|SHIFT', action = picker(true, false) },
-  { key = 'w', mods = 'LEADER', action = picker(false, true) },
-  { key = 'h', mods = 'LEADER', action = act.ActivatePaneDirection 'Left' },
-  { key = 'j', mods = 'LEADER', action = act.ActivatePaneDirection 'Down' },
-  { key = 'k', mods = 'LEADER', action = act.ActivatePaneDirection 'Up' },
-  { key = 'l', mods = 'LEADER', action = act.ActivatePaneDirection 'Right' },
-  { key = 'v', mods = 'LEADER', action = projects.split 'Right' },
-  { key = 's', mods = 'LEADER', action = projects.split 'Bottom' },
-  { key = 'c', mods = 'LEADER', action = wezterm.action_callback(projects.new_tab) },
-  { key = 'n', mods = 'LEADER', action = act.ActivateTabRelative(1) },
-  { key = 'p', mods = 'LEADER', action = act.ActivateTabRelative(-1) },
-  { key = 'H', mods = 'LEADER|SHIFT', action = act.MoveTabRelative(-1) },
-  { key = 'L', mods = 'LEADER|SHIFT', action = act.MoveTabRelative(1) },
-  { key = 'z', mods = 'LEADER', action = act.TogglePaneZoomState },
-  { key = 't', mods = 'LEADER', action = act.TogglePaneZoomState },
-  { key = 'a', mods = 'LEADER', action = act.PaneSelect { alphabet = '123456789' } },
-  { key = 'S', mods = 'LEADER|SHIFT', action = act.PaneSelect { mode = 'SwapWithActive', alphabet = '123456789' } },
-  { key = 'x', mods = 'LEADER', action = act.CloseCurrentPane { confirm = true } },
-  { key = 'r', mods = 'LEADER', action = act.ActivateKeyTable { name = 'resize', one_shot = false } },
-  { key = 'R', mods = 'LEADER|SHIFT', action = act.ReloadConfiguration },
-  { key = 'b', mods = 'LEADER', action = wezterm.action_callback(toggle_tabs) },
-  { key = 'o', mods = 'LEADER', action = wezterm.action_callback(toggle_opaque) },
-  { key = 'm', mods = 'LEADER', action = wezterm.action_callback(function(window) window:maximize() end) },
-  { key = 'F11', mods = 'NONE', action = act.ToggleFullScreen },
-  { key = 'P', mods = 'CTRL|SHIFT', action = act.ActivateCommandPalette },
-  { key = '[', mods = 'LEADER', action = act.ActivateCopyMode },
-  { key = ',', mods = 'LEADER', action = act.PromptInputLine {
+local bindings
+local actions = {
+  projects_all = picker(false, false),
+  projects_refresh = picker(true, false),
+  projects_active = picker(false, true),
+  project_close = wezterm.action_callback(projects.close),
+  pane_left = act.ActivatePaneDirection 'Left',
+  pane_down = act.ActivatePaneDirection 'Down',
+  pane_up = act.ActivatePaneDirection 'Up',
+  pane_right = act.ActivatePaneDirection 'Right',
+  split_right = projects.split 'Right', split_below = projects.split 'Bottom',
+  pane_select = act.PaneSelect { alphabet = '123456789' },
+  pane_swap = act.PaneSelect { mode = 'SwapWithActive', alphabet = '123456789' },
+  pane_zoom = act.TogglePaneZoomState,
+  pane_close = act.CloseCurrentPane { confirm = true },
+  resize_mode = act.ActivateKeyTable { name = 'resize', one_shot = false },
+  tab_new = wezterm.action_callback(projects.new_tab),
+  tab_next = act.ActivateTabRelative(1), tab_previous = act.ActivateTabRelative(-1),
+  tab_number = function(number) return act.ActivateTab(number - 1) end,
+  tab_left = act.MoveTabRelative(-1), tab_right = act.MoveTabRelative(1),
+  tab_rename = act.PromptInputLine {
     description = 'Tab name', action = wezterm.action_callback(function(window, _, title)
       if title and title ~= '' then window:active_tab():set_title(title) end
     end),
-  } },
+  },
+  help = wezterm.action_callback(function(window, pane) bindings.help(window, pane) end),
+  quit = act.QuitApplication, reload = act.ReloadConfiguration,
+  copy = act.ActivateCopyMode, literal_prefix = act.SendKey { key = 'a', mods = 'CTRL' },
+  opacity = wezterm.action_callback(toggle_opaque),
+  maximize = wezterm.action_callback(function(window) window:maximize() end),
+  fullscreen = act.ToggleFullScreen, palette = act.ActivateCommandPalette,
+  drag = act.StartWindowDrag,
+  resize_left = act.AdjustPaneSize { 'Left', 3 }, resize_down = act.AdjustPaneSize { 'Down', 3 },
+  resize_up = act.AdjustPaneSize { 'Up', 3 }, resize_right = act.AdjustPaneSize { 'Right', 3 },
+  resize_exit = act.PopKeyTable,
 }
-for number = 1, 9 do
-  config.keys[#config.keys + 1] = { key = tostring(number), mods = 'LEADER', action = act.ActivateTab(number - 1) }
-end
-config.key_tables = { resize = {
-  { key = 'h', action = act.AdjustPaneSize { 'Left', 3 } },
-  { key = 'j', action = act.AdjustPaneSize { 'Down', 3 } },
-  { key = 'k', action = act.AdjustPaneSize { 'Up', 3 } },
-  { key = 'l', action = act.AdjustPaneSize { 'Right', 3 } },
-  { key = 'Escape', action = act.PopKeyTable },
-  { key = 'Enter', action = act.PopKeyTable },
-} }
-config.mouse_bindings = {
-  { event = { Down = { streak = 1, button = 'Left' } }, mods = 'CTRL|SHIFT', action = act.StartWindowDrag },
-}
+bindings = require('bindings').new(actions)
+config.keys = bindings.keys
+config.key_tables = bindings.key_tables
+config.mouse_bindings = bindings.mouse_bindings
 
 wezterm.on('format-window-title', function(tab)
   local window = wezterm.mux.get_window(tab.window_id)
   return projects.label(window and window:get_workspace() or 'default') .. ' — WezTerm'
 end)
+wezterm.on('format-tab-title', function(tab)
+  local window = wezterm.mux.get_window(tab.window_id)
+  local title = tab.tab_title
+  -- Normalize titles in already-running project tabs created by the older config.
+  if title == '' or title == projects.label(window and window:get_workspace() or 'default') then
+    title = title == '' and tab.active_pane.title or 'Project'
+  end
+  return ' ' .. (tab.tab_index + 1) .. '  ' .. title .. ' '
+end)
 wezterm.on('update-status', function(window)
-  if not window:effective_config().enable_tab_bar then return end
   local mode = window:active_key_table() or (window:leader_is_active() and 'prefix' or '')
   window:set_left_status(wezterm.format {
     { Foreground = { Color = colors.blue } }, { Text = '  ' .. projects.label(window:active_workspace()) .. '  ' },
@@ -161,9 +155,11 @@ wezterm.on('augment-command-palette', function()
   return {
     { brief = 'Projects: open or return to a checkout', action = picker(false, false) },
     { brief = 'Projects: refresh project and worktree list', action = picker(true, false) },
-    { brief = 'Projects: switch running workspace', action = picker(false, true) },
+    { brief = 'Projects: show active projects', action = picker(false, true) },
+    { brief = 'Projects: close current project and all its tabs', action = wezterm.action_callback(projects.close) },
+    { brief = 'WezTerm: quit all projects (one confirmation)', action = act.QuitApplication },
+    { brief = 'Help: keyboard shortcuts', action = actions.help },
     { brief = 'Layout: toggle focus on the current pane', action = act.TogglePaneZoomState },
-    { brief = 'Appearance: toggle tab bar', action = wezterm.action_callback(toggle_tabs) },
     { brief = 'Appearance: toggle opaque / acrylic', action = wezterm.action_callback(toggle_opaque) },
   }
 end)

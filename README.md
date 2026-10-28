@@ -79,7 +79,7 @@ Each applying run prints its backup directory. See [configuration and restoratio
 
 - [Installation options](docs/installation.md): versions, package managers, portable apps, and custom paths.
 - [Neovim workflow](docs/tools/neovim.md) and [PDF shortcut reference](docs/cheatsheets/neovim-workflow-cheatsheet.pdf).
-- [Windows workspaces](docs/tools/wezterm.md), [Windows dependencies](docs/tools/windows-dependencies.md), and [Linux desktop](docs/tools/linux-desktop.md).
+- [Windows workspaces](docs/tools/wezterm.md), [PowerShell and Git worktrees](docs/tools/powershell.md), [Windows dependencies](docs/tools/windows-dependencies.md), and [Linux desktop](docs/tools/linux-desktop.md).
 - [Contributing](docs/contributing.md): repository layout, adding tools, and validation.
 - [Working with coding agents](docs/agent-workflow.md): planning, implementation, and review.
 

@@ -5,7 +5,7 @@ local M = {
 
 function M.config()
 	require("bento").setup({
-		-- Other open project tabs must retain their buffers.
+		-- Keep buffers available across editor views.
 		max_open_buffers = nil,
 		main_keymap = "<leader>bb",
 		map_last_accessed = false,

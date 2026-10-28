@@ -33,20 +33,4 @@ function M.header()
     return items
 end
 
-function M.projects()
-    local projects = require("projects").list()
-    if #projects == 0 then return {} end
-    local counts = {}
-    for _, project in ipairs(projects) do counts[project.name] = (counts[project.name] or 0) + 1 end
-    local items = { { title = "Recent projects", padding = 1 } }
-    for i, project in ipairs(projects) do
-        if i > 3 then break end
-        local name = project.name
-        if counts[name] > 1 then name = name .. " / " .. vim.fs.basename(vim.fs.dirname(project.path)) end
-        items[#items + 1] = { desc = name, key = tostring(i), action = function() require("projects").open(project.path) end }
-    end
-    items[#items].padding = 1
-    return items
-end
-
 return M

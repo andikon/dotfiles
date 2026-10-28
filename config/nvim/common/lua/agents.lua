@@ -20,7 +20,7 @@ function M.show(entry)
     if entry.status == "running" then vim.cmd.startinsert() end
 end
 
--- A job owns an immutable cwd. Hiding its buffer or opening another project never stops it.
+-- A job owns an immutable cwd. Hiding its buffer or switching editor views never stops it.
 function M.launch(command, root, label, show, kind)
     root = norm(root or vim.fn.getcwd())
     if type(command) == "table" and vim.fn.has("win32") == 1 then
@@ -84,7 +84,7 @@ function M.pick(callback)
     local entries = vim.tbl_filter(function(e) return vim.api.nvim_buf_is_valid(e.buf) end, M.jobs)
     if #entries == 0 then return vim.notify("No agent or task terminals yet. Space an starts an agent.") end
     vim.ui.select(entries, {
-        prompt = "Agents / tasks (all projects)",
+        prompt = "Agents / tasks in this editor",
         format_item = function(e) return string.format("%d  %-7s  %s | %s", e.id, e.status, e.label, e.root) end,
     }, callback or M.show)
 end
