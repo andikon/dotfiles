@@ -1,0 +1,1 @@
+Read [the repository guidance](../AGENTS.md) before editing. It points to the ownership rules, catalog conventions, application guides, and validation commands shared by coding agents in this repository.

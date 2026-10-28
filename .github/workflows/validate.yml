@@ -1,0 +1,50 @@
+name: Validate dotfiles
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Validate catalogs and documentation
+        run: python tests/installer/validate_catalog.py
+      - name: Validate shell syntax
+        run: |
+          for script in install.sh installer/bash/*.sh tests/installer/test-bash.sh; do
+            /bin/bash -n "$script"
+          done
+      - name: Test native Bash installer
+        run: /bin/bash tests/installer/test-bash.sh
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Validate catalogs and documentation
+        run: python tests/installer/validate_catalog.py
+      - name: Test Windows PowerShell 5.1
+        shell: powershell
+        run: .\tests\installer\Test-Installer.ps1
+      - name: Test PowerShell 7
+        shell: pwsh
+        run: .\tests\installer\Test-Installer.ps1
+      - name: Test workspace discovery and portable configuration
+        shell: pwsh
+        run: .\tests\wezterm\Verify-WezTerm.ps1

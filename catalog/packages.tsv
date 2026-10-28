@@ -1,0 +1,38 @@
+id	winget	brew	apt	dnf	pacman
+nvim	Neovim.Neovim	neovim	neovim	neovim	neovim
+git	Git.Git	git	git	git	git
+curl	cURL.cURL	curl	curl	curl	curl
+rg	BurntSushi.ripgrep.MSVC	ripgrep	ripgrep	ripgrep	ripgrep
+pwsh	Microsoft.PowerShell	--cask powershell	-	-	-
+powershell	Microsoft.PowerShell	--cask powershell	-	-	-
+fish	-	fish	fish	fish	fish
+tmux	-	tmux	tmux	tmux	tmux
+shell-tools	-	tmux	tmux	tmux	tmux
+fzf	-	fzf	fzf	fzf	fzf
+eza	-	eza	eza	eza	eza
+ghostty	-	--cask ghostty	-	ghostty	ghostty
+vscode	Microsoft.VisualStudioCode	--cask visual-studio-code	-	-	-
+wezterm	wez.wezterm	--cask wezterm	-	-	wezterm
+windows-terminal	Microsoft.WindowsTerminal	-	-	-	-
+glazewm	glzr-io.glazewm	-	-	-	-
+zebar	glzr-io.zebar	-	-	-	-
+node	OpenJS.NodeJS.LTS	node	nodejs	nodejs	nodejs
+java	-	-	-	-	-
+cc	-	-	build-essential	gcc	gcc
+tree-sitter	-	tree-sitter	tree-sitter-cli	tree-sitter-cli	tree-sitter-cli
+font	-	--cask font-jetbrains-mono-nerd-font	-	-	-
+agent	-	-	-	-	-
+copilot	-	-	-	-	-
+idea	-	-	-	-	-
+hypr	-	-	-	hyprland	hyprland
+waybar	-	-	waybar	waybar	waybar
+wofi	-	-	wofi	wofi	wofi
+swaync	-	-	sway-notification-center	swaynotificationcenter	swaync
+cava	-	-	cava	cava	cava
+hyprpaper	-	-	-	hyprpaper	hyprpaper
+hyprlock	-	-	-	hyprlock	hyprlock
+thunar	-	-	thunar	thunar	thunar
+hyprpicker	-	-	-	hyprpicker	hyprpicker
+flameshot	-	-	flameshot	flameshot	flameshot
+wpctl	-	-	wireplumber	wireplumber	wireplumber
+brightnessctl	-	-	brightnessctl	brightnessctl	brightnessctl

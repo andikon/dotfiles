@@ -1,0 +1,18 @@
+id	label	platforms	command	required	optional	group
+nvim	Neovim	windows,macos,linux,wsl	nvim	git,curl,rg	node,java,cc,tree-sitter,agent,font	cli
+fish	fish shell	macos,linux,wsl	fish	-	git,eza	cli
+tmux	tmux	macos,linux,wsl	tmux	-	fzf	cli
+shell-tools	Project shell helpers	macos,linux,wsl	tmux	fzf,nvim	-	cli
+ghostty	Ghostty	macos,linux	ghostty	-	font	gui
+vscode	Visual Studio Code	windows,macos,linux	code	-	vscode-extensions	gui
+idea	IdeaVim	windows,macos,linux	idea	-	-	gui
+powershell	PowerShell profile	windows	pwsh	git	-	cli
+wezterm	WezTerm workspaces	windows	wezterm	pwsh,git	nvim,copilot,font	gui
+windows-terminal	Windows Terminal	windows	wt	-	pwsh	gui
+glazewm	GlazeWM	windows	glazewm	zebar	-	desktop
+zebar	Zebar	windows	zebar	-	-	desktop
+hypr	Hyprland desktop	linux	Hyprland	ghostty,waybar,wofi,swaync,hyprpaper,hyprlock	thunar,hyprpicker,flameshot,wpctl,brightnessctl	desktop
+waybar	Waybar	linux	waybar	-	curl,cava,wpctl	desktop
+swaync	Sway Notification Center	linux	swaync	-	-	desktop
+wofi	Wofi	linux	wofi	-	-	desktop
+cava	CAVA	linux	cava	-	-	desktop

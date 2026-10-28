@@ -1,12 +1,11 @@
 .DS_Store
 .zsh_history
 .zsh_history.new
-.zsh_history.new
 .zsh_sessions
 .luarc.json
-nvim/lazy-lock.json
-.config/tmux/plugins/tpm/
-.config/.oh-my-zsh/
 .secrets
 .dotfiles-sync/
-windows_stuff/wezterm/local.lua
+config/wezterm/windows/local.lua
+**/fish_variables
+**/__pycache__/
+.dotfiles-test-output/

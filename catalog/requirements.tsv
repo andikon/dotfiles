@@ -1,0 +1,7 @@
+command	minimum
+nvim	0.12.0
+git	2.31.0
+curl	8.0.0
+pwsh	7.2.0
+tmux	3.2.0
+tree-sitter	0.26.1
