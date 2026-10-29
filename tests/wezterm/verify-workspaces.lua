@@ -239,6 +239,42 @@ assert(events['format-tab-title'](tab) == ' 1  My notes ', 'Custom tab names mus
 tab.tab_title = ''
 assert(events['format-tab-title'](tab) == ' 1  pwsh ', 'Shell tabs must use the active process title')
 assert(config.window_close_confirmation == 'AlwaysPrompt', 'Native quit must retain its application-wide confirmation')
+assert(config.window_background_opacity == 0 and config.win32_system_backdrop == 'Acrylic', 'Default appearance must use full Windows Acrylic')
+assert(config.text_background_opacity == 1, 'Colored text backgrounds must remain readable')
+local opacity_action
+for _, binding in ipairs(config.keys) do
+  if binding.key == 'o' and binding.mods == 'LEADER' then opacity_action = binding.action end
+end
+local overrides = { font_size = 15 }
+local appearance_window = {
+  get_config_overrides = function() return overrides end,
+  effective_config = function() return { window_background_opacity = overrides.window_background_opacity or config.window_background_opacity } end,
+  set_config_overrides = function(_, value) overrides = value end,
+}
+opacity_action(appearance_window)
+assert(overrides.window_background_opacity == 1 and overrides.win32_system_backdrop == 'Disable', 'Toggle must switch Acrylic to a solid background')
+opacity_action(appearance_window)
+assert(overrides.window_background_opacity == 0 and overrides.win32_system_backdrop == 'Acrylic', 'Second toggle must restore full Acrylic, not the old almost-opaque tint')
+assert(overrides.font_size == 15, 'Appearance toggle must preserve unrelated window overrides')
+local clock = 'Thursday, 29 October 2026 14:37'
+fake.strftime = function(format)
+  assert(format == '%A, %d %B %Y %H:%M', 'Clock must show weekday, date and local time')
+  return clock
+end
+local right_status, left_status, key_table
+local status_window = {
+  active_key_table = function() return key_table end,
+  active_workspace = function() return a.workspace end,
+  set_left_status = function(_, text) left_status = text end,
+  set_right_status = function(_, text) right_status = text end,
+}
+events['update-status'](status_window)
+assert(left_status:find(projects.label(a.workspace), 1, true), 'Header must retain project identity')
+assert(right_status:find(clock, 1, true) and not right_status:find('^a', 1, true) and not right_status:find('help', 1, true), 'Header must show the clock without shortcut hints')
+clock = 'Thursday, 29 October 2026 14:38'
+key_table = 'resize'
+events['update-status'](status_window)
+assert(right_status:find(clock, 1, true) and right_status:find('RESIZE', 1, true), 'Clock must keep updating while resize mode is active')
 os.remove(cache_file)
 vim.fn.delete(options.cache_dir, 'd')
-print('PASS: workspace reuse, process preservation, cancellation, background index, cwd inheritance, headers and project closure.')
+print('PASS: workspace reuse, process preservation, cancellation, background index, cwd inheritance, project closure, Acrylic toggle and header clock.')

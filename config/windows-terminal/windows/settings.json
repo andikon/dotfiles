@@ -2,7 +2,6 @@
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "copyOnSelect": false,
   "profiles": {
-    "list": [],
     "defaults": {
       "font": {
         "face": "JetBrainsMono Nerd Font"

@@ -83,7 +83,7 @@ function Invoke-DotfilesInstaller {
             foreach ($id in @($tool.required -split ',' | Where-Object { $_ -ne '-' })) { if (-not $statuses[$id].Ready) { $ready = $false } }
             $targets = @(Get-DotfilesTargets $context $tool.id)
             $existing = @($targets | Where-Object { Test-DotfilesEntry $_.Destination }).Count -gt 0
-            $action = if ($existing) { 'REPLACE' } else { 'INSTALL' }
+            $action = if ($existing -and $tool.id -eq 'windows-terminal') { 'UPDATE' } elseif ($existing) { 'REPLACE' } else { 'INSTALL' }
             $availability = if ($ready) { 'ready' } else { 'requirements missing; config can be staged' }
             Write-Host ("{0}: {1} ({2})" -f $tool.label, $action, $availability)
             foreach ($target in $targets) {

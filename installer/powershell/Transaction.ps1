@@ -1,3 +1,5 @@
+. (Join-Path $PSScriptRoot 'WindowsTerminal.ps1')
+
 function Test-DotfilesEntry([string]$Path) {
     return $null -ne (Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue)
 }
@@ -97,6 +99,7 @@ function Install-DotfilesTool($Context, $Run, [string]$Tool) {
             }
             $prepared += [pscustomobject]@{ Target = $target; Destination = $destination; Stage = $stage }
             if ($stage) { Copy-Item -LiteralPath $target.Source -Destination $stage -Recurse -Force }
+            if ($stage -and $Tool -eq 'windows-terminal') { Write-DotfilesTerminalSettings $target.Source $destination $stage }
             if ($stage -and $Tool -eq 'wezterm' -and -not $Context.Portable -and (Test-DotfilesEntry (Join-Path $stage 'local.lua'))) { Remove-DotfilesEntry $Context (Join-Path $stage 'local.lua') }
         }
         foreach ($item in $prepared) {

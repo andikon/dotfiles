@@ -5,8 +5,8 @@ return {
   -- editor = 'nvim.exe',
   -- agent = 'copilot.exe',
   -- font = 'JetBrainsMonoNL Nerd Font Mono',
-  -- font_size = 12.0,
-  -- opacity = 0.94, -- 1.0 is fully opaque; acrylic needs a value below 1.0.
+  -- font_size = 12.5,
+  -- opacity = 0.0, -- Full Windows Acrylic blur; 1.0 starts opaque. Ctrl+a o toggles.
   -- max_depth = 4, -- grouping folders below each project root
   -- cache_seconds = 30, -- refresh age; cached results always open immediately
   -- cache_dir = 'C:/Users/your-name/AppData/Local/wezterm/project-index',

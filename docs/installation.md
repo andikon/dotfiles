@@ -83,7 +83,7 @@ Java versions are project-specific, and coding agent CLIs require account setup.
 .\install.ps1 -Only windows-terminal -TerminalDirectory 'C:\Tools\Terminal\settings'
 ```
 
-Installed Windows Terminal stable, preview, and unpackaged configuration directories are detected separately; all discovered targets appear in the review. PowerShell 7's profile path is queried from that shell to account for redirected Documents folders. These profiles target PowerShell 7, even when Windows PowerShell 5.1 launches the wizard.
+Installed Windows Terminal stable, preview, and unpackaged configuration directories are detected separately; all discovered targets appear in the review. Terminal updates preserve machine profiles and default-profile selection while applying shared settings; see the [Terminal guide](tools/windows-terminal.md). PowerShell 7's profile path is queried from that shell to account for redirected Documents folders. These profiles target PowerShell 7, even when Windows PowerShell 5.1 launches the wizard.
 
 `XDG_CONFIG_HOME`, `NVIM_APPNAME`, `VSCODE_PORTABLE`, and `GLAZEWM_CONFIG_PATH` are honored where applicable. A portable WezTerm directory owns the listed Lua config files and its `scripts` directory; executables and libraries remain untouched. Its `local.lua` is backed up and removed during replacement.
 

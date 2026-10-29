@@ -93,7 +93,9 @@ function Get-DotfilesWorkbenchConfigDetails($Config) {
             if (Test-DotfilesEntry $target.Destination) { $details += @('', '! LEGACY CONFIG FOUND', $target.Destination, '! Move into the backup so the new settings take effect.') }
         } else { $details += $target.Destination }
     }
-    $details += @('', 'ACTION', $(if ($Config.Existing) { 'Replace the displayed targets completely.' } else { 'Install new configuration files.' }), '', '+ Backup before replacement')
+    $description = if ($Config.Id -eq 'windows-terminal') { 'Update shared settings; preserve machine profiles, default profile and custom color schemes.' }
+        elseif ($Config.Existing) { 'Replace the displayed targets completely.' } else { 'Install new configuration files.' }
+    $details += @('', 'ACTION', $description, '', '+ Backup before replacement')
     if (-not $Config.Ready) { $details += @('', '! Requirements missing. These config files can be staged for software you install later.') }
     if ($Config.Invalid) { $details += @('', '! ' + $Config.Invalid) }
     return $details
@@ -142,7 +144,7 @@ function Get-DotfilesWorkbenchPage($State) {
             $title = 'MAKE THIS SETUP YOURS'; $intro = 'Choose configurations to install or replace.'; $label = 'CONFIGURATIONS'
             foreach ($config in $State.Configs) {
                 $chosen = [bool]$State.ConfigChosen[$config.Id]
-                $action = if ($config.Disabled -or -not $chosen) { 'SKIP' } elseif ($config.Existing) { 'REPLACE' } else { 'INSTALL' }
+                $action = if ($config.Disabled -or -not $chosen) { 'SKIP' } elseif ($config.Existing -and $config.Id -eq 'windows-terminal') { 'UPDATE' } elseif ($config.Existing) { 'REPLACE' } else { 'INSTALL' }
                 $rows += New-DotfilesWorkbenchRow -Id $config.Id -Label $config.Label -Kind config -Checked $chosen -Disabled $config.Disabled -Badge $action -Role $(if ($chosen) { 2 } else { 1 }) -Details (Get-DotfilesWorkbenchConfigDetails $config)
             }
         }
@@ -150,7 +152,7 @@ function Get-DotfilesWorkbenchPage($State) {
             $title = 'REVIEW YOUR CHANGES'; $intro = 'Everything is queued. Apply only when you are ready.'; $label = 'QUEUED CHANGES'
             foreach ($config in $State.Configs) {
                 if ($config.Id -notin $selected) { continue }
-                $rows += New-DotfilesWorkbenchRow -Id $config.Id -Label $config.Label -Badge $(if ($config.Existing) { 'REPLACE' } else { 'INSTALL' }) -Role 2 -Details (Get-DotfilesWorkbenchConfigDetails $config)
+                $rows += New-DotfilesWorkbenchRow -Id $config.Id -Label $config.Label -Badge $(if ($config.Existing -and $config.Id -eq 'windows-terminal') { 'UPDATE' } elseif ($config.Existing) { 'REPLACE' } else { 'INSTALL' }) -Role 2 -Details (Get-DotfilesWorkbenchConfigDetails $config)
             }
             foreach ($id in @(Get-DotfilesWorkbenchPackages $State)) {
                 $rows += New-DotfilesWorkbenchRow -Id $id -Label "$id program" -Badge 'INSTALL' -Role 3 -Details @('SOFTWARE INSTALLATION', 'Selected software only. Missing permissions, package agreements or old versions may require manual installation.', '', 'BACKUP LOCATION', (Join-Path $State.Context.State 'backups'))

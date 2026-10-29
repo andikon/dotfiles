@@ -32,7 +32,7 @@ The wizard runs with Windows PowerShell 5.1+ or Bash 3.2+. It downloads a tempor
 
 Windows uses the full-screen **Workbench** interface: each step has its own page, with a step sidebar, focused tool details, and a keyboard footer. Software and configuration choices stay queued until Review. Use `Tab` for details, `Backspace` to go back, and `Esc` to cancel. The interface uses native PowerShell and requires no extra packages. Basic or redirected terminals fall back to numbered prompts.
 
-**Replacement is complete within the displayed target.** Stale files in a managed directory are removed, and existing settings are backed up first. VS Code settings and PowerShell modules are managed individually so unrelated files in shared folders remain available. Choosing Skip leaves that configuration untouched.
+**Replacement is complete within the displayed target**, except for Windows Terminal's profile-preserving settings update. Stale files in a managed directory are removed, and existing settings are backed up first. VS Code settings and PowerShell modules are managed individually so unrelated files in shared folders remain available. Windows Terminal keeps machine profiles, default-profile selection and personal schemes while updating shared settings. Choosing Skip leaves that configuration untouched.
 
 On a work PC, choose **I will handle dependencies myself**. The wizard can still configure installed tools, or stage selected configurations for software you will install later.
 
