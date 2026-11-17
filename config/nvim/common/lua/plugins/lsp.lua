@@ -4,7 +4,6 @@ return {
         dependencies = { { "j-hui/fidget.nvim", opts = {} } }, -- LSP progress notifications
     },
     {
-        -- IntelliJ owns Java/Kotlin; Mason manages configuration languages.
         "mason-org/mason-lspconfig.nvim",
         dependencies = {
             { "mason-org/mason.nvim", opts = {} },
@@ -12,8 +11,9 @@ return {
             "saghen/blink.cmp",
         },
         opts = {
-            ensure_installed = { "lua_ls", "ts_ls", "angularls", "tailwindcss", "clangd", "terraformls", "jsonls", "yamlls", "bashls" },
-            automatic_enable = { exclude = { "jdtls", "kotlin_language_server", "kotlin_lsp" } },
+            ensure_installed = { "lua_ls", "ts_ls", "angularls", "tailwindcss", "clangd", "terraformls", "jsonls", "yamlls", "bashls", "jdtls" },
+            -- nvim-jdtls owns Java attachment, including the workspace path.
+            automatic_enable = { exclude = { "jdtls" } },
         },
         config = function(_, opts)
             vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
@@ -22,16 +22,10 @@ return {
         end,
     },
     {
-        "JetBrains/intellij-lsp.nvim",
-        lazy = false,
-        dependencies = { "mfussenegger/nvim-dap" },
-        opts = {
-            server_path = vim.env.INTELLIJ_LSP_SERVER,
-            default_sdk = vim.env.JAVA_HOME,
-            colorscheme = false, keymaps = false, references = false,
-            git = false, single_key_select = false, format_on_save = false,
-            build_output = "on_failure",
-        },
+        "mfussenegger/nvim-jdtls",
+        ft = "java",
+        dependencies = { "mason-org/mason.nvim", "saghen/blink.cmp", "mfussenegger/nvim-dap" },
+        config = function() require("dotfiles.java").setup() end,
     },
     {
         "folke/lazydev.nvim",
@@ -46,8 +40,6 @@ return {
         "saghen/blink.cmp",
         version = "1.*",
         opts = {
-            -- IntelliJ's native completion handles its extended Java edits.
-            enabled = function() return not vim.tbl_contains({ "java", "kotlin" }, vim.bo.filetype) end,
             sources = {
                 default = { "lazydev", "lsp", "path", "snippets", "buffer" },
                 providers = {

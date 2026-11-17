@@ -14,7 +14,7 @@ function M.setup()
     vim.opt.backup = false -- creates a backup file
     vim.opt.cmdheight = 2 -- space in the neovim command line for displaying messages
     vim.opt.fileencoding = "utf-8" -- the encoding written to a file
-    vim.opt.showtabline = 2
+    vim.opt.showtabline = 0
     vim.opt.hidden = true
     vim.opt.autoread = true
     vim.opt.smartcase = true -- smart case

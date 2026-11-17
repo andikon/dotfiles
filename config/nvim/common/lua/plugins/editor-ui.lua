@@ -11,24 +11,6 @@ return {
         end,
     },
     {
-        "nanozuki/tabby.nvim", lazy = false,
-        opts = {
-            line = function(line)
-                return {
-                    { "  VIEWS  ", hl = "TabLineFill" },
-                    line.tabs().foreach(function(tab)
-                        local win = vim.api.nvim_tabpage_get_win(tab.id)
-                        local path = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
-                        local name = vim.t[tab.id].tab_name or (path ~= "" and vim.fs.basename(path) or "[Untitled]")
-                        return { " " .. tab.number() .. " ", name, " ",
-                            hl = tab.is_current() and "TabLineSel" or "TabLine", margin = " " }
-                    end),
-                    line.spacer(), { " Space: shortcuts  ", hl = "TabLineFill" }, hl = "TabLineFill",
-                }
-            end,
-        },
-    },
-    {
         "rebelot/heirline.nvim", lazy = false,
         config = function()
             -- Native fields retain signs, folds and hlchunk's number highlights.
@@ -76,7 +58,7 @@ return {
                 { "<leader>a", group = "AI / agents", mode = { "n", "v" } },
                 { "<leader>b", group = "Buffers" }, { "<leader>c", group = "Code" },
                 { "<leader>d", group = "Debug" }, { "<leader>f", group = "Files" },
-                { "<leader>g", group = "Git" }, { "<leader>j", group = "Java / IntelliJ" },
+                { "<leader>g", group = "Git" }, { "<leader>j", group = "Java" },
                 { "<leader>r", group = "Run" },
                 { "<leader>s", group = "Search" }, { "<leader>t", group = "Terminals" },
                 { "<leader>u", group = "UI" },

@@ -121,7 +121,7 @@ Pane navigation and editor navigation are separate: use the terminal prefix for 
 
 ## Appearance
 
-The Doom Studio appearance uses charcoal surfaces matching the editor, blue accents, JetBrains Mono at 12.5 pt, 1.12 line height and roomier pane padding. Inactive panes dim only slightly, and a steady bar cursor avoids blinking. The default is `window_decorations = 'NONE'`, with no title bar, outer resize border or scrollbar.
+The Doom Studio appearance uses charcoal surfaces, blue accents, JetBrains Mono at 12.5 pt, a line height of 1.16, and roomier pane padding. Inactive panes dim only slightly, and a steady bar cursor avoids blinking. The default is `window_decorations = 'NONE'`, with no title bar, outer resize border or scrollbar.
 
 The compact top project/tab bar stays visible even with one tab: the project and branch appear once on the left, followed by numbered tabs. The right side shows the local weekday, full date and 24-hour time, for example `Thursday, 29 October 2026 14:37`. It updates through WezTerm's normal status event. Resize mode adds a temporary mode label without hiding the clock. Persistent shortcut hints are omitted; **Ctrl+a ?** still opens help. The initial tab is named `Project`; renamed tabs retain their names. Reloading also removes duplicate project labels from older running tabs. Status/title labels use local metadata rather than repeatedly copying the entire catalog.
 

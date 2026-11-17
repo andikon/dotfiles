@@ -196,12 +196,16 @@ try {
     $allWindowsTools = @($context.Tools | Where-Object { Test-DotfilesPlatform $_ 'windows' } | ForEach-Object id)
     & $entryPoint -Only $allWindowsTools -Yes -SkipDependencies -HomeDirectory $allHome
     Assert (Test-Path -LiteralPath (Join-Path $allHome 'Documents/PowerShell/Modules/Dev.Prompt/Dev.Prompt.psm1')) 'PowerShell modules were not staged.'
+    $projectModule = Join-Path $allHome 'Documents/PowerShell/Modules/Dev.Projects'
+    Assert (Test-Path -LiteralPath (Join-Path $projectModule 'ProjectWindows.cs')) 'Project window helper was not staged with its module.'
+    Assert (Test-Path -LiteralPath (Join-Path $projectModule 'Dev.Projects.psm1')) 'Project picker was not staged.'
     Assert (Test-Path -LiteralPath (Join-Path $allHome '.ideavimrc')) 'The IdeaVim dotfile was not staged.'
     Assert (Test-Path -LiteralPath (Join-Path $allHome '.glzr/glazewm/config.yaml')) 'GlazeWM target was not staged.'
     Assert (Test-Path -LiteralPath (Join-Path $allHome '.glzr/zebar/andrij/default_floating.html')) 'Zebar nested assets were not staged.'
     $terminalPath = Join-Path $allHome 'AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json'
     $terminalConfig = Get-Content -LiteralPath $terminalPath -Raw | ConvertFrom-Json
     Assert ($terminalConfig.schemes.Count -gt 0 -and $terminalConfig.actions.Count -gt 0) 'Complete Windows Terminal settings lost their scheme/actions.'
+    Assert (($terminalConfig.actions | Where-Object keys -eq 'alt+w').command.commandline -like '*proj -PickerTab -Active*') 'Installed Windows Terminal cannot launch the active project picker.'
     Write-Host 'PASS: every supported Windows configuration stages independently of a checkout.'
 } finally {
     $absoluteFixture = [IO.Path]::GetFullPath($fixture)

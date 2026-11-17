@@ -43,10 +43,6 @@
     "branch": "main",
     "commit": "debd628e9395f7a9da57bdc31ce75ca6b40a880b"
   },
-  "intellij-lsp.nvim": {
-    "branch": "main",
-    "commit": "77dc3e118a381e59f0d0b3e368e4b3a088280ab7"
-  },
   "lazy.nvim": {
     "branch": "main",
     "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97"
@@ -78,6 +74,10 @@
   "nvim-dap": {
     "branch": "master",
     "commit": "cfa2d58f4537aca6ca83e2de1a0d9f1491121264"
+  },
+  "nvim-jdtls": {
+    "branch": "master",
+    "commit": "6e9d953f0b82bccdb834cfde0e893f3119c22592"
   },
   "nvim-lspconfig": {
     "branch": "master",
@@ -114,10 +114,6 @@
   "snacks.nvim": {
     "branch": "main",
     "commit": "ad9ede6a9cddf16cedbd31b8932d6dcdee9b716e"
-  },
-  "tabby.nvim": {
-    "branch": "main",
-    "commit": "3c130e1fcb598ce39a9c292847e32d7c3987cf11"
   },
   "tokyonight.nvim": {
     "branch": "main",

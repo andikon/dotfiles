@@ -2,6 +2,7 @@ local M = {}
 
 function M.setup()
 	vim.opt.guifont = "JetBrainsMono Nerd Font Mono:h14:#h-none:#e-subpixelantialias"
+	vim.opt.linespace = 1
 	vim.g.neovide_padding_top = 5
 	vim.g.neovide_padding_bottom = 10
 	vim.g.neovide_padding_right = 20

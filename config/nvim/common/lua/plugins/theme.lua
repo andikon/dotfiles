@@ -1,11 +1,18 @@
 return
 {
     {
-        "NTBBloodbath/doom-one.nvim",
+        "sainnhe/gruvbox-material",
         lazy = false,
         priority = 1100,
         init = function()
             vim.opt.background = "dark"
+            vim.g.gruvbox_material_enable_italic = true
+        end,
+    },
+    {
+        "NTBBloodbath/doom-one.nvim",
+        lazy = true,
+        init = function()
             vim.g.doom_one_terminal_colors = true
             vim.g.doom_one_italic_comments = true
             vim.g.doom_one_enable_treesitter = true
@@ -46,13 +53,4 @@ return
         "folke/tokyonight.nvim",
         lazy = true,
     },
-    {
-        'sainnhe/gruvbox-material',
-        lazy = true,
-        config = function()
-            -- Optionally configure and load the colorscheme
-            -- directly inside the plugin declaration.
-            vim.g.gruvbox_material_enable_italic = true
-        end
-    }
 }

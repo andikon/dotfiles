@@ -8,5 +8,5 @@ if vim.g.neovide then
 	require("neovide").setup()
 end
 
-vim.cmd.colorscheme "doom-one"
+vim.cmd.colorscheme "gruvbox-material"
 

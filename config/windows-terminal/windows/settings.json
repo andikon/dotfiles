@@ -1,6 +1,7 @@
 {
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "copyOnSelect": false,
+  "showTerminalTitleInTitlebar": true,
   "profiles": {
     "defaults": {
       "font": {
@@ -19,10 +20,10 @@
     },
     {
       "command": {
-        "action": "moveFocus",
-        "direction": "right"
+        "action": "resizePane",
+        "direction": "left"
       },
-      "keys": "alt+l"
+      "keys": "alt+shift+h"
     },
     {
       "command": {
@@ -33,6 +34,13 @@
     },
     {
       "command": {
+        "action": "resizePane",
+        "direction": "down"
+      },
+      "keys": "alt+shift+j"
+    },
+    {
+      "command": {
         "action": "moveFocus",
         "direction": "up"
       },
@@ -40,9 +48,171 @@
     },
     {
       "command": {
+        "action": "resizePane",
+        "direction": "up"
+      },
+      "keys": "alt+shift+k"
+    },
+    {
+      "command": {
+        "action": "moveFocus",
+        "direction": "right"
+      },
+      "keys": "alt+l"
+    },
+    {
+      "command": {
+        "action": "resizePane",
+        "direction": "right"
+      },
+      "keys": "alt+shift+l"
+    },
+    {
+      "command": {
+        "action": "splitPane",
+        "split": "vertical",
+        "commandline": "pwsh.exe -NoLogo"
+      },
+      "keys": "alt+v"
+    },
+    {
+      "command": {
         "action": "splitPane",
         "split": "horizontal",
-        "commandline": "pwsh -NoExit -Command \"proj\""
+        "commandline": "pwsh.exe -NoLogo"
+      },
+      "keys": "alt+s"
+    },
+    {
+      "command": {
+        "action": "togglePaneZoom"
+      },
+      "keys": "alt+z"
+    },
+    {
+      "command": {
+        "action": "newTab",
+        "commandline": "pwsh.exe -NoLogo"
+      },
+      "keys": "alt+c"
+    },
+    {
+      "command": {
+        "action": "prevTab",
+        "tabSwitcherMode": "disabled"
+      },
+      "keys": "alt+p"
+    },
+    {
+      "command": {
+        "action": "nextTab",
+        "tabSwitcherMode": "disabled"
+      },
+      "keys": "alt+n"
+    },
+    {
+      "command": {
+        "action": "moveTab",
+        "direction": "backward"
+      },
+      "keys": "alt+shift+p"
+    },
+    {
+      "command": {
+        "action": "moveTab",
+        "direction": "forward"
+      },
+      "keys": "alt+shift+n"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 0
+      },
+      "keys": "alt+1"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 1
+      },
+      "keys": "alt+2"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 2
+      },
+      "keys": "alt+3"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 3
+      },
+      "keys": "alt+4"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 4
+      },
+      "keys": "alt+5"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 5
+      },
+      "keys": "alt+6"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 6
+      },
+      "keys": "alt+7"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 7
+      },
+      "keys": "alt+8"
+    },
+    {
+      "command": {
+        "action": "tabSearch"
+      },
+      "keys": "alt+/"
+    },
+    {
+      "command": {
+        "action": "newTab",
+        "tabTitle": "Projects",
+        "commandline": "pwsh.exe -NoLogo -NoExit -Command \"proj -PickerTab\""
+      },
+      "keys": "alt+f"
+    },
+    {
+      "command": {
+        "action": "newTab",
+        "tabTitle": "Projects",
+        "commandline": "pwsh.exe -NoLogo -NoExit -Command \"proj -PickerTab -Active\""
+      },
+      "keys": "alt+w"
+    },
+    {
+      "command": {
+        "action": "newTab",
+        "tabTitle": "Projects",
+        "commandline": "pwsh.exe -NoLogo -NoExit -Command \"proj -PickerTab -Last\""
+      },
+      "keys": "alt+backspace"
+    },
+    {
+      "command": {
+        "action": "commandPalette"
       },
       "keys": "ctrl+shift+p"
     }

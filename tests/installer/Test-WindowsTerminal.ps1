@@ -40,6 +40,20 @@ try {
     Assert ($installed.profiles.defaults.historySize -eq 1234 -and $installed.profiles.defaults.font.size -eq 15) 'Unmanaged profile defaults were lost.'
     Assert ($installed.profiles.defaults.font.face -eq 'JetBrainsMono Nerd Font' -and $installed.profiles.defaults.colorScheme -eq 'Teide Darker') 'Shared appearance settings were not applied.'
     Assert ($installed.actions.Count -gt 0 -and @($installed.schemes | Where-Object name -eq 'Personal scheme').Count -eq 1) 'Actions or a scheme used by a personal profile were lost.'
+    Assert (($installed.actions | Where-Object keys -eq 'alt+h').command.action -eq 'moveFocus') 'Pane navigation was lost during merge.'
+    Assert (($installed.actions | Where-Object keys -eq 'alt+f').command.action -eq 'newTab') 'The project picker must launch in a dedicated tab.'
+    Assert (($installed.actions | Where-Object keys -eq 'ctrl+shift+p').command.action -eq 'commandPalette') 'Migration must restore the command palette shortcut.'
+    $projectRun = New-DotfilesRun $context
+    Install-DotfilesTool $context $projectRun 'powershell'
+    $projectModule = Join-Path $fixture 'home/Documents/PowerShell/Modules/Dev.Projects'
+    Assert (Test-Path -LiteralPath (Join-Path $projectModule 'ProjectWindows.cs')) 'The project window helper was not installed.'
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        Import-Module (Join-Path $projectModule 'Dev.Projects.psm1') -Force -ErrorAction Stop
+        Assert ([bool](Get-Command proj -Module Dev.Projects -ErrorAction Stop)) 'The installed project picker cannot be imported.'
+        Add-Type -Path (Join-Path $projectModule 'ProjectWindows.cs') -ErrorAction Stop
+        Assert ([Dotfiles.ProjectWindows]::Find('dotfiles-window-install-test', $null) -eq [IntPtr]::Zero) 'Project window lookup found an unrelated window.'
+        Remove-Module Dev.Projects
+    }
     Assert (@($installed.schemes | Where-Object name -eq 'Teide Darker').Count -eq 1 -and ($installed.schemes | Where-Object name -eq 'Teide Darker').background -eq '#171B20') 'Managed color schemes were duplicated or not updated.'
     Assert ([IO.File]::ReadAllText($run.Journal.Entries[0].Backup) -ceq $original) 'Backup did not retain the exact original JSONC bytes.'
     $secondRun = New-DotfilesRun $context

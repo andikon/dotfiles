@@ -86,7 +86,7 @@ function M.setup()
     bind("<leader><tab>n", "<cmd>tabnew<cr>", "New view tab")
     bind("<leader><tab>r", function()
         vim.ui.input({ prompt = "Tab name: " }, function(name)
-            if name and name ~= "" then vim.t.tab_name = name; vim.cmd.redrawtabline() end
+            if name and name ~= "" then vim.t.tab_name = name; vim.cmd.redrawstatus() end
         end)
     end, "Rename tab")
     bind("<leader><tab>x", "<cmd>confirm tabclose<cr>", "Close view tab")
@@ -98,10 +98,7 @@ function M.setup()
     bind("<leader>as", function() require("agents").stop() end, "Stop agent / task")
     bind("<leader>rb", function() require("agents").task("build") end, "Build project")
     bind("<leader>rt", function() require("agents").task("test") end, "Test project")
-    bind("<leader>rr", "<cmd>IntellijLspRun<cr>", "Run Java at cursor")
-    bind("<leader>rd", function() require("intellij-lsp.run").run_at_cursor(false) end, "Debug Java at cursor")
-    bind("<leader>rl", vim.lsp.codelens.run, "Run Java code lens")
-    bind("<leader>rs", "<cmd>IntellijLspRunStop<cr>", "Stop Java run / build")
+    bind("<leader>rl", vim.lsp.codelens.run, "Run code lens")
     bind("<leader>db", function() require("dap").toggle_breakpoint() end, "Toggle breakpoint")
     bind("<leader>dB", function()
         vim.ui.input({ prompt = "Breakpoint condition: " }, function(value)
@@ -111,19 +108,13 @@ function M.setup()
     for key, spec in pairs({
         dc = { "continue", "Continue debugger" }, dn = { "step_over", "Step over" },
         di = { "step_into", "Step into" }, ["do"] = { "step_out", "Step out" },
-        dq = { "stop", "Stop debugger" }, dv = { "open", "Debug panel" },
+        dq = { "terminate", "Stop debugger" },
     }) do
         local fn = spec[1]
-        bind("<leader>" .. key, function() require("intellij-lsp.debug")[fn]() end, spec[2])
+        bind("<leader>" .. key, function() require("dap")[fn]() end, spec[2])
     end
-    bind("<leader>de", function() require("intellij-lsp.debug").evaluate_at_cursor() end, "Evaluate expression", { "n", "x" })
-    bind("<leader>dw", function() require("intellij-lsp.debug").watch_at_cursor() end, "Watch expression", { "n", "x" })
-    bind("<leader>ji", "<cmd>checkhealth intellij-lsp<cr>", "IntelliJ health")
-    bind("<leader>jl", "<cmd>IntellijLspLicense<cr>", "IntelliJ license / sign in")
-    bind("<leader>jo", "<cmd>IntellijLspOutput<cr>", "Java import / build output")
-    bind("<leader>jr", "<cmd>IntellijLspReload<cr>", "Reload Java project")
-    bind("<leader>jR", "<cmd>IntellijLspRestart<cr>", "Restart IntelliJ server")
-    bind("<leader>jn", "<cmd>IntellijLspFileTemplate<cr>", "Java file template")
+    bind("<leader>dv", function() require("dap").repl.toggle() end, "Debug console")
+    bind("<leader>de", function() require("dap.ui.widgets").hover() end, "Evaluate expression", { "n", "x" })
     bind("<leader>cs", function() Snacks.picker.lsp_symbols() end, "Document symbols / outline")
     bind("<leader>cS", function() Snacks.picker.lsp_workspace_symbols() end, "Workspace symbols")
     bind("<leader>ci", vim.lsp.buf.incoming_calls, "Incoming calls")
@@ -141,21 +132,6 @@ function M.setup()
     bind("<leader>?", function() require("which-key").show({ global = false }) end, "Show buffer shortcuts")
     bind("<leader>qq", "<cmd>confirm qall<cr>", "Quit Neovim")
     bind("<Esc><Esc>", "<C-\\><C-n>", "Terminal normal mode", "t")
-
-    vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("DotfilesLspKeys", { clear = true }),
-        callback = function(event)
-            local client = vim.lsp.get_client_by_id(event.data.client_id)
-            if not client or client.name ~= "intellij" then return end
-            vim.schedule(function()
-                if not vim.api.nvim_buf_is_valid(event.buf) then return end
-                -- The upstream debugger's bare leader-b would hide our whole buffer group.
-                pcall(vim.keymap.del, "n", "<leader>b", { buffer = event.buf })
-                pcall(vim.keymap.del, "n", "<leader>B", { buffer = event.buf })
-                vim.keymap.set("i", "<C-Space>", vim.lsp.completion.get, { buffer = event.buf, desc = "Java completion" })
-            end)
-        end,
-    })
 end
 
 return M
