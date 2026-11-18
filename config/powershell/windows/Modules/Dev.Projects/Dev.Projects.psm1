@@ -4,7 +4,7 @@ function Get-ProjectId([string]$Path) {
 }
 
 function Get-ProjectTitle([string]$Path, [string]$Id) {
-    "$(Split-Path -Leaf $Path) [$($Id.Substring($Id.Length - 8))]"
+    Split-Path -Leaf $Path
 }
 
 function Get-ProjectCheckouts {
@@ -119,6 +119,24 @@ function Write-ProjectState([string]$File, $Value) {
     [IO.File]::Move($temp, $File, $true)
 }
 
+function Get-ProjectTabs {
+    if (-not ('Dotfiles.ProjectWindows' -as [type])) {
+        Add-Type -Path (Join-Path $PSScriptRoot 'ProjectWindows.cs') -ErrorAction Stop
+    }
+    $window = [Dotfiles.ProjectWindows]::CurrentTerminalWindow()
+    if ($window -eq [IntPtr]::Zero) { throw 'Run proj inside the Windows Terminal window where the project should open.' }
+    Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes -ErrorAction Stop
+    $root = [System.Windows.Automation.AutomationElement]::FromHandle($window)
+    $condition = [System.Windows.Automation.PropertyCondition]::new(
+        [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+        [System.Windows.Automation.ControlType]::TabItem)
+    $tabs = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, $condition)
+    if ($tabs.Count -eq 0) { throw 'Windows Terminal did not expose its tabs to UI Automation.' }
+    foreach ($tab in $tabs) {
+        [pscustomobject]@{ Name = $tab.Current.Name; Element = $tab }
+    }
+}
+
 function proj {
     [CmdletBinding(DefaultParameterSetName = 'Picker')]
     param(
@@ -127,17 +145,9 @@ function proj {
         [Parameter(ParameterSetName = 'Path', Mandatory)][string]$Path,
         [Parameter(ParameterSetName = 'Last', Mandatory)][switch]$Last,
         [switch]$NewTab,
-        [ValidateSet('editor', 'full')][string]$Layout = 'editor',
         [switch]$PickerTab
     )
-    if (-not $IsWindows) { Write-Warning 'Project windows require Windows Terminal on Windows.'; return }
-    if (-not ('Dotfiles.ProjectWindows' -as [type])) {
-        try { Add-Type -Path (Join-Path $PSScriptRoot 'ProjectWindows.cs') -ErrorAction Stop }
-        catch {
-            Write-Warning "Windows project switching could not load its window helper. $($_.Exception.Message)"
-            return
-        }
-    }
+    if (-not $IsWindows) { Write-Warning 'Project tabs require Windows Terminal on Windows.'; return }
     $stateDir = Join-Path $env:LOCALAPPDATA 'dotfiles/terminal-projects'
     [void][IO.Directory]::CreateDirectory($stateDir)
     $historyFile = Join-Path $stateDir 'history.json'
@@ -145,7 +155,7 @@ function proj {
     $openedFile = Join-Path $stateDir 'opened.json'
     if ($Last) {
         $projectPath = (Read-ProjectState $historyFile).previous
-        if (-not $projectPath) { Write-Warning 'No previous project window.'; return }
+        if (-not $projectPath) { Write-Warning 'No previous project tab.'; return }
     } elseif ($PSCmdlet.ParameterSetName -eq 'Path') {
         $resolved = (Resolve-Path -LiteralPath $Path -ErrorAction Stop).ProviderPath
         $projectPath = git -C $resolved rev-parse --show-toplevel 2>$null
@@ -162,13 +172,13 @@ function proj {
         $projects = @(@($projects) + @(Read-ProjectState $openedFile) |
             Where-Object { $_ -and (Test-Path -LiteralPath $_.Path -PathType Container) } |
             Sort-Object -Property Path -Unique)
+        $tabs = @(Get-ProjectTabs)
         if ($Active) {
             $projects = @($projects | Where-Object {
-                $id = Get-ProjectId $_.Path
-                [Dotfiles.ProjectWindows]::Find($id, (Get-ProjectTitle $_.Path $id)) -ne [IntPtr]::Zero
+                (Get-ProjectTitle $_.Path (Get-ProjectId $_.Path)) -in $tabs.Name
             })
         }
-        if (-not $projects) { Write-Warning 'No matching project windows or checkouts.'; return }
+        if (-not $projects) { Write-Warning 'No matching project tabs or checkouts.'; return }
         $selected = Select-ProjectCheckout @($projects)
         if (-not $selected) { if ($PickerTab) { exit }; return }
         $projectPath = $selected.Path
@@ -183,40 +193,28 @@ function proj {
         try { $locked = $mutex.WaitOne(8000) }
         catch [Threading.AbandonedMutexException] { $locked = $true }
         if (-not $locked) { Write-Warning 'Another project is opening. Try again.'; return }
-        $window = [Dotfiles.ProjectWindows]::Find($id, $title)
-        if ($window -ne [IntPtr]::Zero) {
-            if ($NewTab) { Invoke-ProjectTerminal @('-w', $id, 'new-tab', '-d', $projectPath, 'pwsh.exe') }
-            elseif (-not [Dotfiles.ProjectWindows]::Focus($window)) {
-                Write-Warning 'Windows did not grant focus. Select the project window with Alt+Tab.'
-                return
-            }
+        $tabs = @(Get-ProjectTabs)
+        $tab = $tabs | Where-Object Name -eq $title | Select-Object -First 1
+        # Plain titles can collide across checkouts; open rather than focus a wrong project.
+        $otherPaths = @(@(Read-ProjectState $cacheFile) + @(Read-ProjectState $openedFile) | Where-Object {
+            $_ -and $_.Path -ne $projectPath -and (Split-Path -Leaf $_.Path) -eq $title
+        })
+        if ($otherPaths.Count) { $tab = $null }
+        if ($tab -and -not $NewTab) {
+            $pattern = $tab.Element.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern)
+            $pattern.Select()
+        } elseif ($tab -and $NewTab) {
+            Invoke-ProjectTerminal @('-w', '0', 'new-tab', '-d', $projectPath, 'pwsh.exe')
         } else {
-            if ($Active -or $Last) { Write-Warning 'That project window has closed.'; return }
+            if ($Active -or $Last) { Write-Warning 'That project tab has closed.'; return }
             if (-not (Test-Path -LiteralPath $projectPath -PathType Container)) {
                 Write-Warning 'The checkout is no longer on disk. Run proj -Refresh.'
                 return
             }
-            $editor = Get-Command nvim.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
-            $agent = if ($Layout -eq 'full') { Get-Command copilot.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1 }
-            if (-not $editor) { Write-Warning 'Neovim is unavailable. Opening PowerShell in the editor pane.' }
-            if ($Layout -eq 'full' -and -not $agent) { Write-Warning 'Copilot is unavailable. Opening PowerShell in the agent pane.' }
-            $launch = @('-w', $id, 'new-tab', '-d', $projectPath, '--title', $title, '--suppressApplicationTitle',
-                $(if ($editor) { $editor.Source } else { 'pwsh.exe' }),
-                ';', 'split-pane', '-V', '-d', $projectPath, '--title', $title, '--suppressApplicationTitle',
-                $(if ($agent) { $agent.Source } else { 'pwsh.exe' }))
-            if ($Layout -eq 'full') { $launch += @(';', 'split-pane', '-H', '-d', $projectPath, '--title', $title, '--suppressApplicationTitle', 'pwsh.exe') }
-            $launch += @(';', 'move-focus', 'left')
-            Invoke-ProjectTerminal $launch
-            for ($attempt = 0; $attempt -lt 40; $attempt++) {
-                $window = [Dotfiles.ProjectWindows]::Find($id, $title)
-                if ($window -ne [IntPtr]::Zero) { break }
-                Start-Sleep -Milliseconds 100
-            }
-            if ($window -eq [IntPtr]::Zero) {
-                Write-Warning 'Windows Terminal did not confirm the project window. Check Alt+Tab before retrying.'
-                return
-            }
+            Invoke-ProjectTerminal @('-w', '0', 'new-tab', '-d', $projectPath,
+                '--title', $title, '--suppressApplicationTitle', 'pwsh.exe', '-NoLogo')
         }
+
         $current = Read-ProjectState $historyFile
         if ($current.current -ne $projectPath) {
             Write-ProjectState $historyFile @{ current = $projectPath; previous = $current.current }
@@ -236,4 +234,37 @@ function proj {
     if ($PickerTab) { exit }
 }
 
-Export-ModuleMember -Function proj
+function Start-ProjectPicker {
+    if (-not $IsWindows -or -not $env:WT_SESSION -or $env:WEZTERM_PANE) { return }
+    # Retire an older GUI helper when migrating to the terminal executable.
+    Stop-ProjectPicker
+    $state = Join-Path $env:LOCALAPPDATA 'dotfiles/terminal-projects'
+    $exe = Join-Path $state 'picker.exe'
+    $hashFile = Join-Path $state 'picker.hash'
+    $snapshot = Get-Item (Join-Path $state 'picker.tsv') -ErrorAction SilentlyContinue
+    if ((Test-Path $exe) -and (Test-Path $hashFile) -and $snapshot -and
+        ((Get-Date) - $snapshot.LastWriteTime).TotalSeconds -lt 60) {
+        $hash = (@('ProjectPicker.cs', 'ProjectWindows.cs') | ForEach-Object {
+            Get-FileHash (Join-Path $PSScriptRoot $_) | ForEach-Object Hash
+        }) -join ''
+        if ([IO.File]::ReadAllText($hashFile) -eq $hash) { return }
+    }
+    $start = [Diagnostics.ProcessStartInfo]::new((Get-Process -Id $PID).Path)
+    $start.UseShellExecute = $false
+    $start.CreateNoWindow = $true
+    $start.WindowStyle = 'Hidden'
+    foreach ($arg in @('-NoLogo', '-NoProfile', '-File', (Join-Path $PSScriptRoot 'Start-ProjectPicker.ps1'))) {
+        $start.ArgumentList.Add($arg)
+    }
+    [Diagnostics.Process]::Start($start).Dispose()
+}
+
+function Stop-ProjectPicker {
+    $stop = $null
+    if ([Threading.EventWaitHandle]::TryOpenExisting('Local\Dotfiles.Terminal.ProjectPicker.Stop', [ref]$stop)) {
+        [void]$stop.Set()
+        $stop.Dispose()
+    }
+}
+
+Export-ModuleMember -Function proj, Start-ProjectPicker, Stop-ProjectPicker

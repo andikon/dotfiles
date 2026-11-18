@@ -1,6 +1,14 @@
 local M = {}
 
 function M.setup()
+    if vim.fn.has("win32") == 1 then
+        vim.opt.shell = "pwsh.exe"
+        vim.opt.shellcmdflag = "-NoLogo -NoProfile -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new(); $PSStyle.OutputRendering='PlainText';"
+        vim.opt.shellquote = ""
+        vim.opt.shellxquote = ""
+        vim.opt.shellpipe = "> %s 2>&1"
+        vim.opt.shellredir = "> %s 2>&1"
+    end
 	-- settings
     vim.g.mapleader = " "
     vim.opt.cursorcolumn = false

@@ -44,7 +44,7 @@ return {
     },
     quickfile = { enabled = true },
     statuscolumn = { enabled = false }, -- Heirline owns the gutter.
-    terminal = { enabled = true },
+    terminal = { enabled = true, shell = vim.fn.has("win32") == 1 and { "pwsh.exe", "-NoLogo" } or nil },
     words = { enabled = true },
     styles = {
       notification = {

@@ -64,8 +64,10 @@ function Write-DotfilesTerminalSettings([string]$Source, [string]$Destination, [
     if ($managed.profiles.PSObject.Properties['list'] -or $managed.PSObject.Properties['defaultProfile'] -or $managed.PSObject.Properties['disabledProfileSources']) {
         throw 'Repository Terminal settings must not define machine profiles or profile selection.'
     }
-    if (-not (Test-DotfilesEntry $Destination)) { return }
-    try { $existing = ConvertFrom-DotfilesTerminalJson ([IO.File]::ReadAllText($Destination)) }
+    try {
+        if (Test-DotfilesEntry $Destination) { $existing = ConvertFrom-DotfilesTerminalJson ([IO.File]::ReadAllText($Destination)) }
+        else { $existing = [pscustomobject]@{} }
+    }
     catch { throw "Cannot safely read Windows Terminal settings at $Destination. Repair the JSONC or restore a backup; the original file was left untouched." }
     if ($existing.PSObject.Properties['profiles']) {
         if ($existing.profiles -is [array]) {
@@ -74,11 +76,45 @@ function Write-DotfilesTerminalSettings([string]$Source, [string]$Destination, [
         } elseif ($existing.profiles -isnot [pscustomobject]) { throw 'Existing Terminal profiles must be an object or legacy array; original file was left untouched.' }
         if ($existing.profiles.PSObject.Properties['list'] -and $existing.profiles.list -isnot [array]) { throw 'Existing Terminal profile list must be an array; original file was left untouched.' }
     }
+    # Override only the standard generated PowerShell 7 profile. Keep its identity,
+    # executable path, arguments and appearance so ordinary startup and Alt+c agree.
+    $powershellGuid = '{574e775e-4f2a-5b96-ac1e-a2962a402336}'
+    if (-not $existing.PSObject.Properties['profiles']) {
+        $existing | Add-Member -NotePropertyName profiles -NotePropertyValue ([pscustomobject]@{})
+    }
+    $powershellProfile = @($existing.profiles.list | Where-Object guid -eq $powershellGuid) | Select-Object -First 1
+    if (-not $powershellProfile) {
+        $powershellProfile = [pscustomobject]@{
+            guid = $powershellGuid; name = 'PowerShell'; source = 'Windows.Terminal.PowershellCore'
+        }
+        $existing.profiles | Add-Member -NotePropertyName list -NotePropertyValue (@($existing.profiles.list | Where-Object { $null -ne $_ }) + @($powershellProfile)) -Force
+    }
+    $commandline = [string]$powershellProfile.commandline
+    if ([string]::IsNullOrWhiteSpace($commandline)) { $commandline = 'pwsh.exe -NoLogo' }
+    elseif ($commandline -notmatch '(?i)(?:^|\s)-nologo(?:\s|$)') {
+        # Insert before arguments such as -Command/-File, which consume the rest.
+        $commandline = [regex]::Replace($commandline, '^("[^"]+"|\S+)', '$1 -NoLogo')
+    }
+    if ($powershellProfile.PSObject.Properties['commandline']) { $powershellProfile.commandline = $commandline }
+    else { $powershellProfile | Add-Member -NotePropertyName commandline -NotePropertyValue $commandline }
     # A profile can reference a custom scheme, so retain schemes not owned by the repo.
     if ($existing.PSObject.Properties['schemes']) {
         $ownedNames = @($managed.schemes | ForEach-Object name)
         $managed.schemes = @($existing.schemes | Where-Object { $_.name -notin $ownedNames }) + @($managed.schemes)
     }
+    # Terminal's settings UI separates action definitions from keybindings.
+    # Replace both sides together so an older binding cannot point at a removed ID.
+    $ownedKeys = @($managed.keybindings | ForEach-Object keys)
+    $oldIds = @($existing.keybindings | Where-Object { $_.keys -in $ownedKeys } | ForEach-Object id)
+    $retainedBindings = @($existing.keybindings | Where-Object { $_.keys -notin $ownedKeys })
+    $retainedIds = @($retainedBindings | ForEach-Object id)
+    $ownedIds = @($managed.actions | ForEach-Object id)
+    $retainedActions = @($existing.actions | Where-Object {
+        $_.keys -notin $ownedKeys -and $_.id -notin $ownedIds -and
+        ($_.id -notin $oldIds -or $_.id -in $retainedIds)
+    })
+    $managed.actions = $retainedActions + @($managed.actions)
+    $managed | Add-Member -NotePropertyName keybindings -NotePropertyValue ($retainedBindings + @($managed.keybindings)) -Force
     Merge-DotfilesTerminalObject $existing $managed
     $json = ConvertTo-Json -InputObject $existing -Depth 100 -WarningAction Stop
     [IO.File]::WriteAllText($Stage, $json, (New-Object Text.UTF8Encoding($false)))

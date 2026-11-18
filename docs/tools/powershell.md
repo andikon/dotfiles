@@ -34,3 +34,7 @@ powershell -NoProfile -File tests/powershell/Test-GitWorktree.ps1
 ```
 
 These checks create disposable repositories and a local bare remote. They exercise real Git operations without accessing hosted repositories or changing your active profile.
+
+## Git prompt
+
+Git status runs in one background worker, with a per-directory cache refreshed after two seconds. The first prompt in a directory shows the path immediately; branch and change counts appear on the next prompt after the worker finishes. Counts show staged (`+`), modified (`~`), deleted (`-`), untracked (`?`) and conflicted (`!`) files. The prompt never waits for a running Git query and does not redraw while you type.

@@ -68,3 +68,5 @@ Use `:Lazy restore` for reproducible installation. In a Java buffer, **Space jo*
 Press **Space** and pause for the current shortcuts. The [PDF cheatsheet](../cheatsheets/neovim-workflow-cheatsheet.pdf) predates the JDT LS migration.
 
 Upstream documentation for [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls), [CopilotChat](https://github.com/CopilotC-Nvim/CopilotChat.nvim), [Treesitter](https://github.com/nvim-treesitter/nvim-treesitter), [hlchunk](https://github.com/shellRaining/hlchunk.nvim), [Heirline](https://github.com/rebelot/heirline.nvim), [Incline](https://github.com/b0o/incline.nvim), and [Markdown](https://github.com/MeanderingProgrammer/render-markdown.nvim).
+
+On Windows, editor-hosted interactive shell terminals use PowerShell 7 (`pwsh.exe -NoLogo`) and load your normal PowerShell profile. Neovim shell commands use PowerShell 7 with `-NoProfile` and UTF-8 output. Install the PowerShell configuration separately to get the same prompt and helpers as your Windows Terminal tabs.

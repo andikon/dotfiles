@@ -205,7 +205,8 @@ try {
     $terminalPath = Join-Path $allHome 'AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json'
     $terminalConfig = Get-Content -LiteralPath $terminalPath -Raw | ConvertFrom-Json
     Assert ($terminalConfig.schemes.Count -gt 0 -and $terminalConfig.actions.Count -gt 0) 'Complete Windows Terminal settings lost their scheme/actions.'
-    Assert (($terminalConfig.actions | Where-Object keys -eq 'alt+w').command.commandline -like '*proj -PickerTab -Active*') 'Installed Windows Terminal cannot launch the active project picker.'
+    $activePicker = $terminalConfig.keybindings | Where-Object keys -eq 'alt+w'
+    Assert (($terminalConfig.actions | Where-Object id -eq $activePicker.id).command.action -eq 'tabSearch') 'Installed Windows Terminal must search live tabs.'
     Write-Host 'PASS: every supported Windows configuration stages independently of a checkout.'
 } finally {
     $absoluteFixture = [IO.Path]::GetFullPath($fixture)

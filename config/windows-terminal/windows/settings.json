@@ -16,191 +16,191 @@
         "action": "moveFocus",
         "direction": "left"
       },
-      "keys": "alt+h"
+      "id": "User.Dotfiles.alt_h"
     },
     {
       "command": {
         "action": "resizePane",
         "direction": "left"
       },
-      "keys": "alt+shift+h"
+      "id": "User.Dotfiles.alt_shift_h"
     },
     {
       "command": {
         "action": "moveFocus",
         "direction": "down"
       },
-      "keys": "alt+j"
+      "id": "User.Dotfiles.alt_j"
     },
     {
       "command": {
         "action": "resizePane",
         "direction": "down"
       },
-      "keys": "alt+shift+j"
+      "id": "User.Dotfiles.alt_shift_j"
     },
     {
       "command": {
         "action": "moveFocus",
         "direction": "up"
       },
-      "keys": "alt+k"
+      "id": "User.Dotfiles.alt_k"
     },
     {
       "command": {
         "action": "resizePane",
         "direction": "up"
       },
-      "keys": "alt+shift+k"
+      "id": "User.Dotfiles.alt_shift_k"
     },
     {
       "command": {
         "action": "moveFocus",
         "direction": "right"
       },
-      "keys": "alt+l"
+      "id": "User.Dotfiles.alt_l"
     },
     {
       "command": {
         "action": "resizePane",
         "direction": "right"
       },
-      "keys": "alt+shift+l"
+      "id": "User.Dotfiles.alt_shift_l"
     },
     {
       "command": {
         "action": "splitPane",
         "split": "vertical",
-        "commandline": "pwsh.exe -NoLogo"
+        "commandline": "pwsh.exe -NoLogo",
+        "splitMode": "duplicate"
       },
-      "keys": "alt+v"
+      "id": "User.Dotfiles.alt_v"
     },
     {
       "command": {
         "action": "splitPane",
         "split": "horizontal",
-        "commandline": "pwsh.exe -NoLogo"
+        "commandline": "pwsh.exe -NoLogo",
+        "splitMode": "duplicate"
       },
-      "keys": "alt+s"
+      "id": "User.Dotfiles.alt_s"
     },
     {
       "command": {
         "action": "togglePaneZoom"
       },
-      "keys": "alt+z"
+      "id": "User.Dotfiles.alt_z"
     },
     {
       "command": {
         "action": "newTab",
-        "commandline": "pwsh.exe -NoLogo"
+        "profile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}"
       },
-      "keys": "alt+c"
+      "id": "User.Dotfiles.alt_c"
     },
     {
       "command": {
         "action": "prevTab",
         "tabSwitcherMode": "disabled"
       },
-      "keys": "alt+p"
+      "id": "User.Dotfiles.alt_p"
     },
     {
       "command": {
         "action": "nextTab",
         "tabSwitcherMode": "disabled"
       },
-      "keys": "alt+n"
+      "id": "User.Dotfiles.alt_n"
     },
     {
       "command": {
         "action": "moveTab",
         "direction": "backward"
       },
-      "keys": "alt+shift+p"
+      "id": "User.Dotfiles.alt_shift_p"
     },
     {
       "command": {
         "action": "moveTab",
         "direction": "forward"
       },
-      "keys": "alt+shift+n"
+      "id": "User.Dotfiles.alt_shift_n"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 0
       },
-      "keys": "alt+1"
+      "id": "User.Dotfiles.alt_1"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 1
       },
-      "keys": "alt+2"
+      "id": "User.Dotfiles.alt_2"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 2
       },
-      "keys": "alt+3"
+      "id": "User.Dotfiles.alt_3"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 3
       },
-      "keys": "alt+4"
+      "id": "User.Dotfiles.alt_4"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 4
       },
-      "keys": "alt+5"
+      "id": "User.Dotfiles.alt_5"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 5
       },
-      "keys": "alt+6"
+      "id": "User.Dotfiles.alt_6"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 6
       },
-      "keys": "alt+7"
+      "id": "User.Dotfiles.alt_7"
     },
     {
       "command": {
         "action": "switchToTab",
         "index": 7
       },
-      "keys": "alt+8"
+      "id": "User.Dotfiles.alt_8"
     },
     {
       "command": {
         "action": "tabSearch"
       },
-      "keys": "alt+/"
+      "id": "User.Dotfiles.alt_slash"
     },
     {
       "command": {
         "action": "newTab",
         "tabTitle": "Projects",
-        "commandline": "pwsh.exe -NoLogo -NoExit -Command \"proj -PickerTab\""
+        "commandline": "\"%LOCALAPPDATA%\\dotfiles\\terminal-projects\\picker.exe\""
       },
-      "keys": "alt+f"
+      "id": "User.Dotfiles.alt_f"
     },
     {
       "command": {
-        "action": "newTab",
-        "tabTitle": "Projects",
-        "commandline": "pwsh.exe -NoLogo -NoExit -Command \"proj -PickerTab -Active\""
+        "action": "tabSearch"
       },
-      "keys": "alt+w"
+      "id": "User.Dotfiles.alt_w"
     },
     {
       "command": {
@@ -208,13 +208,25 @@
         "tabTitle": "Projects",
         "commandline": "pwsh.exe -NoLogo -NoExit -Command \"proj -PickerTab -Last\""
       },
-      "keys": "alt+backspace"
+      "id": "User.Dotfiles.alt_backspace"
     },
     {
       "command": {
         "action": "commandPalette"
       },
-      "keys": "ctrl+shift+p"
+      "id": "User.Dotfiles.ctrl_shift_p"
+    },
+    {
+      "id": "User.Dotfiles.alt_x",
+      "command": {
+        "action": "closePane"
+      }
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_x",
+      "command": {
+        "action": "closeTab"
+      }
     }
   ],
   "schemes": [
@@ -264,5 +276,132 @@
       "brightWhite": "#DFDFDF",
       "brightYellow": "#ECBE7B"
     }
-  ]
+  ],
+  "keybindings": [
+    {
+      "id": "User.Dotfiles.alt_h",
+      "keys": "alt+h"
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_h",
+      "keys": "alt+shift+h"
+    },
+    {
+      "id": "User.Dotfiles.alt_j",
+      "keys": "alt+j"
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_j",
+      "keys": "alt+shift+j"
+    },
+    {
+      "id": "User.Dotfiles.alt_k",
+      "keys": "alt+k"
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_k",
+      "keys": "alt+shift+k"
+    },
+    {
+      "id": "User.Dotfiles.alt_l",
+      "keys": "alt+l"
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_l",
+      "keys": "alt+shift+l"
+    },
+    {
+      "id": "User.Dotfiles.alt_v",
+      "keys": "alt+v"
+    },
+    {
+      "id": "User.Dotfiles.alt_s",
+      "keys": "alt+s"
+    },
+    {
+      "id": "User.Dotfiles.alt_z",
+      "keys": "alt+z"
+    },
+    {
+      "id": "User.Dotfiles.alt_c",
+      "keys": "alt+c"
+    },
+    {
+      "id": "User.Dotfiles.alt_p",
+      "keys": "alt+p"
+    },
+    {
+      "id": "User.Dotfiles.alt_n",
+      "keys": "alt+n"
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_p",
+      "keys": "alt+shift+p"
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_n",
+      "keys": "alt+shift+n"
+    },
+    {
+      "id": "User.Dotfiles.alt_1",
+      "keys": "alt+1"
+    },
+    {
+      "id": "User.Dotfiles.alt_2",
+      "keys": "alt+2"
+    },
+    {
+      "id": "User.Dotfiles.alt_3",
+      "keys": "alt+3"
+    },
+    {
+      "id": "User.Dotfiles.alt_4",
+      "keys": "alt+4"
+    },
+    {
+      "id": "User.Dotfiles.alt_5",
+      "keys": "alt+5"
+    },
+    {
+      "id": "User.Dotfiles.alt_6",
+      "keys": "alt+6"
+    },
+    {
+      "id": "User.Dotfiles.alt_7",
+      "keys": "alt+7"
+    },
+    {
+      "id": "User.Dotfiles.alt_8",
+      "keys": "alt+8"
+    },
+    {
+      "id": "User.Dotfiles.alt_slash",
+      "keys": "alt+/"
+    },
+    {
+      "id": "User.Dotfiles.alt_f",
+      "keys": "alt+f"
+    },
+    {
+      "id": "User.Dotfiles.alt_w",
+      "keys": "alt+w"
+    },
+    {
+      "id": "User.Dotfiles.alt_backspace",
+      "keys": "alt+backspace"
+    },
+    {
+      "id": "User.Dotfiles.ctrl_shift_p",
+      "keys": "ctrl+shift+p"
+    },
+    {
+      "id": "User.Dotfiles.alt_x",
+      "keys": "alt+x"
+    },
+    {
+      "id": "User.Dotfiles.alt_shift_x",
+      "keys": "alt+shift+x"
+    }
+  ],
+  "alwaysShowTabs": true
 }
